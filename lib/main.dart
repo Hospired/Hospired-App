@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'login_page.dart';
+import 'DatabaseHelper.dart';
+import 'package:intl/intl.dart';
 
 // ===================== MAIN =====================
 
@@ -55,132 +56,7 @@ class AppTheme {
   );
 }
 
-// ===================== DATABASE HELPER =====================
 
-class DatabaseHelper {
-  static Database? _db;
-
-  Future<Database> get database async {
-    if (_db != null) return _db!;
-    _db = await _initDB();
-    return _db!;
-  }
-
-  Future<Database> _initDB() async {
-    final dbPath = await getDatabasesPath();
-    final path = p.join(dbPath, 'hospired.db');
-
-    return await openDatabase(
-      path,
-      version: 1,
-      onCreate: (db, version) async {
-        await db.execute('''
-          CREATE TABLE usuarios(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            cedula TEXT UNIQUE,
-            password TEXT
-          )
-        ''');
-
-        await db.insert('usuarios', {'cedula': '1234567890', 'password': '1234'});
-      },
-    );
-  }
-
-  Future<Map<String, dynamic>?> login(String cedula, String password) async {
-    final db = await database;
-    final res = await db.query(
-      'usuarios',
-      where: 'cedula = ? AND password = ?',
-      whereArgs: [cedula, password],
-    );
-    return res.isNotEmpty ? res.first : null;
-  }
-}
-
-// ===================== LOGIN PAGE =====================
-
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
-
-  @override
-  State<LoginPage> createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
-  final TextEditingController cedulaController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final DatabaseHelper dbHelper = DatabaseHelper();
-
-  String error = "";
-  bool loading = false;
-
-  void _login() async {
-    FocusScope.of(context).unfocus();
-    setState(() => loading = true);
-
-    final user = await dbHelper.login(
-      cedulaController.text.trim(),
-      passwordController.text.trim(),
-    );
-
-    setState(() => loading = false);
-
-    if (user != null) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('isLogged', true);
-
-      Navigator.pushReplacementNamed(context, '/home');
-    } else {
-      setState(() => error = "Cédula o contraseña incorrecta");
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('H O S P I R E D')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: cedulaController,
-              decoration: const InputDecoration(
-                labelText: "Número de Identificación",
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: "Contraseña",
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            loading
-                ? const CircularProgressIndicator()
-                : ElevatedButton(
-                    onPressed: _login,
-                    style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryColor),
-                    child: const Text("Ingresar"),
-                  ),
-            if (error.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Text(error, style: const TextStyle(color: Colors.red)),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 // ===================== HOME PAGE =====================
 
@@ -322,21 +198,153 @@ class PerfilPage extends StatelessWidget {
   }
 }
 
-class CitasPage extends StatelessWidget {
+// CITAS
+
+
+class CitasPage extends StatefulWidget {
   const CitasPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Lista de citas'));
-  }
+  State<CitasPage> createState() => _CitasPageState();
 }
 
-class TratamientoPage extends StatelessWidget {
-  const TratamientoPage({super.key});
+class _CitasPageState extends State<CitasPage> {
+  final DatabaseHelper dbHelper = DatabaseHelper();
+  List<Map<String, dynamic>> citas = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCitas();
+  }
+
+  Future<void> _loadCitas() async {
+    final data = await dbHelper.getCitas();
+    setState(() {
+      citas = data;
+    });
+  }
+
+  void _agendarCita() async {
+    final proxima = await dbHelper.getProximaCitaDisponible();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Confirmar Cita"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("Doctor asignado: ${proxima['doctor']}"),
+              const SizedBox(height: 8),
+              Text("Fecha: ${DateFormat('dd/MM/yyyy').format(DateTime.parse(proxima['fecha']!))}"),
+              Text("Hora: ${proxima['hora']}"),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancelar")),
+            ElevatedButton(
+              onPressed: () async {
+                await dbHelper.addCita(
+                  proxima['doctor']!,
+                  proxima['fecha']!,
+                  proxima['hora']!,
+                );
+                Navigator.pop(context);
+                _loadCitas();
+              },
+              child: const Text("Confirmar"),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('Tratamientos asignados'));
+    return Scaffold(
+      appBar: AppBar(title: const Text('Citas')),
+      body: citas.isEmpty
+          ? const Center(child: Text("No hay citas registradas"))
+          : ListView.builder(
+              itemCount: citas.length,
+              itemBuilder: (context, index) {
+                final cita = citas[index];
+                return Card(
+                  margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  child: ListTile(
+                    leading: const Icon(Icons.calendar_today, color: Colors.teal),
+                    title: Text("Cita con ${cita['doctor']}"),
+                    subtitle: Text(
+                      "${DateFormat('dd/MM/yyyy').format(DateTime.parse(cita['fecha']))} - ${cita['hora']}",
+                    ),
+                  ),
+                );
+              },
+            ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _agendarCita,
+        backgroundColor: Colors.teal,
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+
+
+// TRATAMIENTO
+class TratamientoPage extends StatelessWidget {
+  const TratamientoPage({super.key});
+
+  // Lista de medicamentos de ejemplo
+  final List<Map<String, String>> medicamentos = const [
+    {"nombre": "Paracetamol", "hora": "08:00 AM"},
+    {"nombre": "Amoxicilina", "hora": "12:00 PM"},
+    {"nombre": "Ibuprofeno", "hora": "06:00 PM"},
+    {"nombre": "Vitamina C", "hora": "09:00 PM"},
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Tratamiento')),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Medicamentos y Horarios",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            Expanded(
+              child: ListView.builder(
+                itemCount: medicamentos.length,
+                itemBuilder: (context, index) {
+                  final med = medicamentos[index];
+                  return Card(
+                    elevation: 3,
+                    margin: const EdgeInsets.symmetric(vertical: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ListTile(
+                      leading: const Icon(Icons.medical_services, color: Colors.teal),
+                      title: Text(med['nombre']!),
+                      subtitle: Text("Tomar a las ${med['hora']}"),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
