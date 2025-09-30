@@ -1,6 +1,6 @@
 <div align="center">
   <a href="https://github.com/Hospired">
-    <img src="src/assets/hospired.png" alt="Logo" width="300">
+    <img src="https://github.com/Hospired/hospired_admin/blob/main/src/assets/hospired.png" alt="Logo" width="300">
   </a>
 </div>
 
