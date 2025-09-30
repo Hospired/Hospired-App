@@ -3,17 +3,108 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'login_page.dart';
 import 'DatabaseHelper.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+
+
+// instancia global del plugin
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
+// Inicializa timezone y el plugin (llamar desde main)
+Future<void> initNotifications() async {
+  tz.initializeTimeZones();
+  tz.setLocalLocation(tz.getLocation('America/Managua'));
+
+  const AndroidInitializationSettings androidInit =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+
+  final InitializationSettings initSettings =
+      InitializationSettings(android: androidInit);
+
+  await flutterLocalNotificationsPlugin.initialize(initSettings);
+}
+
+// Función para programar una notificación diaria para un medicamento.
+// Usa el id (por ejemplo el id de la fila en SQLite) para evitar duplicados.
+Future<void> scheduleMedicationNotification({
+  required int id,
+  required String title,
+  required String body,
+  required String timeString, // espera "08:00 AM" o "20:00"
+}) async {
+  final now = DateTime.now();
+
+  // Intentar varios formatos comunes
+  DateTime? parsed;
+  try {
+    parsed = DateFormat('hh:mm a').parse(timeString); // e.g. 08:00 AM
+  } catch (_) {
+    try {
+      parsed = DateFormat('HH:mm').parse(timeString); // e.g. 20:00
+    } catch (_) {
+      parsed = null;
+    }
+  }
+
+  if (parsed == null) {
+    print('scheduleMedicationNotification: formato hora no válido: $timeString');
+    return;
+  }
+
+  DateTime scheduled = DateTime(
+    now.year,
+    now.month,
+    now.day,
+    parsed.hour,
+    parsed.minute,
+  );
+
+  if (scheduled.isBefore(now)) scheduled = scheduled.add(const Duration(days: 1));
+
+  // Evitar duplicados: cancelar notificación previa con mismo id
+  await flutterLocalNotificationsPlugin.cancel(id);
+
+  await flutterLocalNotificationsPlugin.zonedSchedule(
+    id,
+    title,
+    body,
+    tz.TZDateTime.from(scheduled, tz.local),
+    NotificationDetails(
+      android: AndroidNotificationDetails(
+        'med_channel_id',
+        'Recordatorios de Medicamentos',
+        channelDescription: 'Recordatorios diarios de medicamentos',
+        importance: Importance.max,
+        priority: Priority.high,
+      ),
+    ),
+    androidAllowWhileIdle: true,
+    uiLocalNotificationDateInterpretation:
+        UILocalNotificationDateInterpretation.absoluteTime,
+    // repetir todos los días a la misma hora
+    matchDateTimeComponents: DateTimeComponents.time,
+  );
+
+  print('Notificación programada: id=$id at ${scheduled.toIso8601String()}');
+}
+
 
 // ===================== MAIN =====================
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Inicializar notificaciones y timezone
+  await initNotifications();
+
   final prefs = await SharedPreferences.getInstance();
   final isLogged = prefs.getBool('isLogged') ?? false;
 
   runApp(MyApp(initialRoute: isLogged ? '/home' : '/login'));
 }
+
 
 class MyApp extends StatelessWidget {
   final String initialRoute;
@@ -300,55 +391,83 @@ class _CitasPageState extends State<CitasPage> {
 
 
 
-// TRATAMIENTO
-class TratamientoPage extends StatelessWidget {
+class TratamientoPage extends StatefulWidget {
   const TratamientoPage({super.key});
 
-  // Lista de medicamentos de ejemplo
-  final List<Map<String, String>> medicamentos = const [
-    {"nombre": "Paracetamol", "hora": "08:00 AM"},
-    {"nombre": "Amoxicilina", "hora": "12:00 PM"},
-    {"nombre": "Ibuprofeno", "hora": "06:00 PM"},
-    {"nombre": "Vitamina C", "hora": "09:00 PM"},
-  ];
+  @override
+  State<TratamientoPage> createState() => _TratamientoPageState();
+}
+
+class _TratamientoPageState extends State<TratamientoPage> {
+  final DatabaseHelper dbHelper = DatabaseHelper();
+  List<Map<String, dynamic>> medicamentos = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMedicamentos();
+  }
+
+  Future<void> _loadMedicamentos() async {
+  final data = await dbHelper.getMedicamentos();
+  setState(() {
+    medicamentos = data;
+  });
+
+  for (var med in data) {
+    final int id = med['id'] as int; // asegúrate que 'id' existe
+    final String nombre = med['nombre'] as String;
+    final String hora = med['hora'] as String;
+    await scheduleMedicationNotification(
+      id: id,
+      title: 'Recordatorio de medicamento',
+      body: 'Es hora de tomar $nombre',
+      timeString: hora,
+    );
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Tratamiento')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Medicamentos y Horarios",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-            Expanded(
-              child: ListView.builder(
-                itemCount: medicamentos.length,
-                itemBuilder: (context, index) {
-                  final med = medicamentos[index];
-                  return Card(
-                    elevation: 3,
-                    margin: const EdgeInsets.symmetric(vertical: 8),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+      body: medicamentos.isEmpty
+          ? const Center(child: Text("No hay medicamentos registrados"))
+          : Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Medicamentos y Horarios",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: medicamentos.length,
+                      itemBuilder: (context, index) {
+                        final med = medicamentos[index];
+                        return Card(
+                          elevation: 3,
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: ListTile(
+                            leading: const Icon(Icons.medical_services, color: Colors.teal),
+                            title: Text(med['nombre']),
+                            subtitle: Text("Tomar a las ${med['hora']}"),
+                            trailing: const Icon(Icons.notifications_active, color: Colors.red),
+                          ),
+                        );
+                      },
                     ),
-                    child: ListTile(
-                      leading: const Icon(Icons.medical_services, color: Colors.teal),
-                      title: Text(med['nombre']!),
-                      subtitle: Text("Tomar a las ${med['hora']}"),
-                    ),
-                  );
-                },
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 }

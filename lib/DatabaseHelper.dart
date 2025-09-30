@@ -1,6 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as p;
-import 'package:intl/intl.dart'; // Para formatear fecha
+import 'package:intl/intl.dart';
 
 class DatabaseHelper {
   static Database? _db;
@@ -52,6 +52,22 @@ class DatabaseHelper {
           'fecha': '2025-10-15',
           'hora': '4:00 PM'
         });
+
+        // Tabla de tratamientos 
+        await db.execute('''
+          CREATE TABLE tratamientos(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT,
+            hora TEXT
+          )
+        ''');
+
+        // Inserta medicamentos iniciales
+        await db.insert('tratamientos', {'nombre': 'Paracetamol', 'hora': '08:00 AM'});
+        await db.insert('tratamientos', {'nombre': 'Amoxicilina', 'hora': '12:00 PM'});
+        await db.insert('tratamientos', {'nombre': 'Ibuprofeno', 'hora': '06:00 PM'});
+        await db.insert('tratamientos', {'nombre': 'Vitamina C', 'hora': '09:00 PM'});
+
       },
     );
   }
@@ -105,4 +121,39 @@ class DatabaseHelper {
 
     return {"doctor": doctor, "fecha": fecha, "hora": hora};
   }
+
+  // ===================== TRATAMIENTOS =====================
+
+// Obtener lista de medicamentos
+Future<List<Map<String, dynamic>>> getMedicamentos() async {
+  final db = await database;
+  return await db.query('tratamientos', orderBy: 'hora ASC');
+}
+
+// Insertar nuevo medicamento
+Future<int> addMedicamento(String nombre, String hora) async {
+  final db = await database;
+  return await db.insert('tratamientos', {
+    'nombre': nombre,
+    'hora': hora,
+  });
+}
+
+// Eliminar medicamento
+Future<int> deleteMedicamento(int id) async {
+  final db = await database;
+  return await db.delete('tratamientos', where: 'id = ?', whereArgs: [id]);
+}
+
+// Actualizar medicamento
+Future<int> updateMedicamento(int id, String nombre, String hora) async {
+  final db = await database;
+  return await db.update(
+    'tratamientos',
+    {'nombre': nombre, 'hora': hora},
+    where: 'id = ?',
+    whereArgs: [id],
+  );
+}
+
 }
