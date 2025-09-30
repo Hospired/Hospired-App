@@ -220,10 +220,15 @@ class _CitasPageState extends State<CitasPage> {
 
   Future<void> _loadCitas() async {
     final data = await dbHelper.getCitas();
-    setState(() {
-      citas = data;
-    });
+
+  for (var cita in data) {
+    print("📅 Fecha en BD: ${cita['fecha']}");
   }
+
+  setState(() {
+    citas = data;
+  });
+      }
 
   void _agendarCita() async {
     final proxima = await dbHelper.getProximaCitaDisponible();
@@ -278,8 +283,8 @@ class _CitasPageState extends State<CitasPage> {
                     leading: const Icon(Icons.calendar_today, color: Colors.teal),
                     title: Text("Cita con ${cita['doctor']}"),
                     subtitle: Text(
-                      "${DateFormat('dd/MM/yyyy').format(DateTime.parse(cita['fecha']))} - ${cita['hora']}",
-                    ),
+                    "${DateFormat('dd/MM/yyyy').format(DateTime.parse(cita['fecha'] as String))} - ${cita['hora']}"
+                      ),
                   ),
                 );
               },
