@@ -28,7 +28,10 @@ class DatabaseHelper {
           )
         ''');
 
-        await db.insert('usuarios', {'cedula': '1234567890', 'password': '1234'});
+        await db.insert('usuarios', {
+          'cedula': '1234567890',
+          'password': '1234',
+        });
 
         // Tabla de citas
         await db.execute('''
@@ -44,16 +47,16 @@ class DatabaseHelper {
         await db.insert('citas', {
           'doctor': 'Dr. Pérez',
           'fecha': '2025-10-12',
-          'hora': '10:00 AM'
+          'hora': '10:00 AM',
         });
 
         await db.insert('citas', {
           'doctor': 'Dra. Martínez',
           'fecha': '2025-10-15',
-          'hora': '4:00 PM'
+          'hora': '4:00 PM',
         });
 
-        // Tabla de tratamientos 
+        // Tabla de tratamientos
         await db.execute('''
           CREATE TABLE tratamientos(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -63,11 +66,22 @@ class DatabaseHelper {
         ''');
 
         // Inserta medicamentos iniciales
-        await db.insert('tratamientos', {'nombre': 'Paracetamol', 'hora': '08:00 AM'});
-        await db.insert('tratamientos', {'nombre': 'Amoxicilina', 'hora': '12:00 PM'});
-        await db.insert('tratamientos', {'nombre': 'Ibuprofeno', 'hora': '06:00 PM'});
-        await db.insert('tratamientos', {'nombre': 'Vitamina C', 'hora': '09:00 PM'});
-
+        await db.insert('tratamientos', {
+          'nombre': 'Paracetamol',
+          'hora': '08:00 AM',
+        });
+        await db.insert('tratamientos', {
+          'nombre': 'Amoxicilina',
+          'hora': '12:00 PM',
+        });
+        await db.insert('tratamientos', {
+          'nombre': 'Ibuprofeno',
+          'hora': '06:00 PM',
+        });
+        await db.insert('tratamientos', {
+          'nombre': 'Vitamina C',
+          'hora': '09:00 PM',
+        });
       },
     );
   }
@@ -124,36 +138,32 @@ class DatabaseHelper {
 
   // ===================== TRATAMIENTOS =====================
 
-// Obtener lista de medicamentos
-Future<List<Map<String, dynamic>>> getMedicamentos() async {
-  final db = await database;
-  return await db.query('tratamientos', orderBy: 'hora ASC');
-}
+  // Obtener lista de medicamentos
+  Future<List<Map<String, dynamic>>> getMedicamentos() async {
+    final db = await database;
+    return await db.query('tratamientos', orderBy: 'hora ASC');
+  }
 
-// Insertar nuevo medicamento
-Future<int> addMedicamento(String nombre, String hora) async {
-  final db = await database;
-  return await db.insert('tratamientos', {
-    'nombre': nombre,
-    'hora': hora,
-  });
-}
+  // Insertar nuevo medicamento
+  Future<int> addMedicamento(String nombre, String hora) async {
+    final db = await database;
+    return await db.insert('tratamientos', {'nombre': nombre, 'hora': hora});
+  }
 
-// Eliminar medicamento
-Future<int> deleteMedicamento(int id) async {
-  final db = await database;
-  return await db.delete('tratamientos', where: 'id = ?', whereArgs: [id]);
-}
+  // Eliminar medicamento
+  Future<int> deleteMedicamento(int id) async {
+    final db = await database;
+    return await db.delete('tratamientos', where: 'id = ?', whereArgs: [id]);
+  }
 
-// Actualizar medicamento
-Future<int> updateMedicamento(int id, String nombre, String hora) async {
-  final db = await database;
-  return await db.update(
-    'tratamientos',
-    {'nombre': nombre, 'hora': hora},
-    where: 'id = ?',
-    whereArgs: [id],
-  );
-}
-
+  // Actualizar medicamento
+  Future<int> updateMedicamento(int id, String nombre, String hora) async {
+    final db = await database;
+    return await db.update(
+      'tratamientos',
+      {'nombre': nombre, 'hora': hora},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
 }
