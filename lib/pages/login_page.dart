@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../DatabaseHelper.dart';
+
+import '../backend-api/api_service.dart';
 import '../theme.dart';
 
 class LoginPage extends StatefulWidget {
@@ -11,31 +12,31 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController cedulaController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final DatabaseHelper dbHelper = DatabaseHelper();
 
   String error = "";
   bool loading = false;
 
-  void _login() async {
+  void _login(BuildContext context) async {
     FocusScope.of(context).unfocus();
     setState(() => loading = true);
 
-    final user = await dbHelper.login(
-      cedulaController.text.trim(),
-      passwordController.text.trim(),
-    );
+    try {
+      await ApiService.signInUser(
+        emailController.text.trim(),
+        passwordController.text.trim(),
+      );
 
-    setState(() => loading = false);
-
-    if (user != null) {
+      // TODO: the following will be removed, session will be handled by supabase client
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isLogged', true);
 
       Navigator.pushReplacementNamed(context, '/home');
-    } else {
+    } catch (e) {
       setState(() => error = "Cédula o contraseña incorrecta");
+    } finally {
+      setState(() => loading = false);
     }
   }
 
@@ -53,9 +54,10 @@ class _LoginPageState extends State<LoginPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextField(
-                controller: cedulaController,
+                controller: emailController,
+                readOnly: loading,
                 decoration: const InputDecoration(
-                  labelText: "Número de Identificación",
+                  labelText: "Correo Electrónico",
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
@@ -64,6 +66,7 @@ class _LoginPageState extends State<LoginPage> {
               TextField(
                 controller: passwordController,
                 obscureText: true,
+                readOnly: loading,
                 decoration: const InputDecoration(
                   labelText: "Contraseña",
                   border: OutlineInputBorder(),
@@ -71,9 +74,21 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 16),
               loading
-                  ? const CircularProgressIndicator()
+                  ? const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(8),
+                        child: CircularProgressIndicator(
+                          constraints: BoxConstraints(
+                            minWidth: 48,
+                            maxWidth: 48,
+                            minHeight: 48,
+                            maxHeight: 48,
+                          ),
+                        ),
+                      ),
+                    )
                   : ElevatedButton(
-                      onPressed: _login,
+                      onPressed: () => _login(context),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.primaryColor,
                       ),

@@ -1,3 +1,20 @@
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+// All API functions to make requests to the supabase backend go here
 class ApiService {
-  // All API functions to make requests to the supabase backend will go here
+  static final SupabaseClient _supabase = Supabase.instance.client;
+
+  static Future<User> signInUser(String email, String password) async {
+    try {
+      final AuthResponse response = await _supabase.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+      return response.user!;
+    } on AuthException catch (e) {
+      throw Exception(e.message);
+    } catch (e) {
+      throw Exception('An unexpected error occurred: $e');
+    }
+  }
 }
