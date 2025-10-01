@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'backend-api/init_supabase.dart';
 import 'pages/login_page.dart';
 import 'pages/home_page.dart';
 import 'notifications_service.dart';
@@ -9,7 +10,8 @@ import 'theme.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Inicializar notificaciones y timezone
+  // Inicializar supabase, notificaciones y timezone
+  await initSupabase();
   await initNotifications();
 
   final prefs = await SharedPreferences.getInstance();
