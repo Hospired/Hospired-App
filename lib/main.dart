@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'login_page.dart';
+import 'pages/login_page.dart';
 import 'pages/home_page.dart';
 import 'notifications_service.dart';
-
-// ===================== MAIN =====================
+import 'theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,30 +35,4 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
     );
   }
-}
-
-// ===================== THEME =====================
-
-class AppTheme {
-  static const Color primaryColor = Color.fromRGBO(35, 169, 214, 1);
-
-  static final ThemeData theme = ThemeData(
-    scaffoldBackgroundColor: Colors.grey[100],
-    appBarTheme: const AppBarTheme(
-      backgroundColor: primaryColor,
-      iconTheme: IconThemeData(color: Colors.white),
-      titleTextStyle: TextStyle(
-        color: Colors.white,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
-      ),
-      centerTitle: true,
-      elevation: 4,
-    ),
-    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      selectedItemColor: primaryColor,
-      unselectedItemColor: Colors.grey,
-      backgroundColor: Colors.white,
-    ),
-  );
 }

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'DatabaseHelper.dart';
-import 'main.dart';
-
-// ===================== LOGIN PAGE =====================
+import '../DatabaseHelper.dart';
+import '../theme.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -72,7 +70,9 @@ class _LoginPageState extends State<LoginPage> {
                 ? const CircularProgressIndicator()
                 : ElevatedButton(
                     onPressed: _login,
-                    style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryColor),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primaryColor,
+                    ),
                     child: const Text("Ingresar"),
                   ),
             if (error.isNotEmpty)
