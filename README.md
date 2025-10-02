@@ -56,6 +56,7 @@ cd asistente-virtual-android
 1. Conectar un dispositivo Android o iniciar un emulador.
 2. En Android Studio, presionar el botón Run.
 3. La aplicación se instalará y abrirá automáticamente en el dispositivo.
+4. Inicie sección con la cuenta de administrador creado en hospired_admin
    
 ### Próximas Mejoras
 - Integración con modelos de IA avanzados (ChatGPT / Gemini)
