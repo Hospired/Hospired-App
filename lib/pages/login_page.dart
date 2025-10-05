@@ -89,9 +89,6 @@ class _LoginPageState extends State<LoginPage> {
                     )
                   : ElevatedButton(
                       onPressed: () => _login(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.primaryColor,
-                      ),
                       child: const Text("Ingresar"),
                     ),
               if (error.isNotEmpty)
