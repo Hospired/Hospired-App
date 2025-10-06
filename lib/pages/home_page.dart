@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import '../colors.dart';
+import '../providers/auth_user.dart';
+import '../providers/app_user.dart';
+import '../text_styles.dart';
 
 import 'appointment_page.dart';
 import 'chat_bot_page.dart';
@@ -6,7 +13,92 @@ import 'map_page.dart';
 import 'pathologies_page.dart';
 import 'profile_page.dart';
 import 'treatment_page.dart';
+import 'setup_user_page.dart';
 
+class HomePage extends HookConsumerWidget {
+  const HomePage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final loading = useState<bool>(true);
+    final loadingError = useState<bool>(false);
+    final appUser = ref.watch(appUserProvider);
+    final authUser = ref.watch(authUserProvider);
+
+    final fetchAppUser = useCallback(() async {
+      if (authUser != null) {
+        loading.value = true;
+        loadingError.value = false;
+        try {
+          final appUserRes = await ref.read(appUserProvider.notifier).fetch();
+          if (appUserRes == null) {
+            // go to setup as the app user is not created yet
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              '/setup-user',
+              (route) => false,
+            );
+          }
+        } catch (err) {
+          loadingError.value = true;
+        } finally {
+          loading.value = false;
+        }
+      } else {
+        // the authUser is null => go to login again
+        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+      }
+    }, []);
+
+    useEffect(() {
+      fetchAppUser();
+      return;
+    }, []);
+
+    if ((appUser == null) && (loading.value || loadingError.value)) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              if (loading.value) ...[
+                Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Text(
+                    "Cargando usuario ...",
+                    style: HospiredTextStyle.title3.copyWith(
+                      color: HospiredColors.primary,
+                    ),
+                  ),
+                ),
+              ],
+              if (loadingError.value) ...[
+                Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Text(
+                    "Error al cargar usuario",
+                    style: HospiredTextStyle.body2.copyWith(
+                      color: HospiredColors.danger,
+                    ),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () => fetchAppUser(),
+                  child: const Text("Volver a intentar"),
+                ),
+              ],
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Scaffold(body: const Column(children: []));
+  }
+}
+
+/*
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -62,3 +154,4 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+*/

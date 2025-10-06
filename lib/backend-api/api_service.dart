@@ -6,6 +6,21 @@ import 'dtos.dart';
 class ApiService {
   static final SupabaseClient _supabase = Supabase.instance.client;
 
+  static AuthUserRes? checkAndGetUserSession() {
+    try {
+      final User? authUser = _supabase.auth.currentUser;
+      if (authUser != null) {
+        return AuthUserRes(
+          id: authUser.id,
+          email: authUser.email ?? "${authUser.id}@hospired.com.ni",
+        );
+      }
+      return null;
+    } catch (e) {
+      throw Exception('Failed to check user session: $e');
+    }
+  }
+
   static Future<AppUserRes?> getAppUser(String id) async {
     try {
       final Map<String, dynamic>? response = await _supabase
