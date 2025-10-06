@@ -11,7 +11,7 @@ class StartPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     useEffect(() {
-      Future.microtask(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
         final authUserRes = ref.read(authUserProvider.notifier).checkSession();
         if (authUserRes != null) {
           Navigator.pushNamedAndRemoveUntil(context, '/home', (_) => false);

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:hive/hive.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -12,7 +14,16 @@ final authUserProvider = StateNotifierProvider<AuthUserNotifier, AuthUserRes?>((
 
 class AuthUserNotifier extends StateNotifier<AuthUserRes?> {
   AuthUserNotifier() : super(null) {
-    state = Hive.box("session").get("authUser");
+    final authUser = Hive.box("session").get("authUser");
+
+    if (authUser != null) {
+      final authUserJson = jsonDecode(authUser) as Map<String, dynamic>;
+      try {
+        state = AuthUserRes.fromJson(authUserJson);
+      } catch (e) {
+        state = null;
+      }
+    }
   }
 
   AuthUserRes? checkSession() {
@@ -26,7 +37,7 @@ class AuthUserNotifier extends StateNotifier<AuthUserRes?> {
   }
 
   void set(AuthUserRes authUser) {
-    Hive.box("session").put("authUser", authUser);
+    Hive.box("session").put("authUser", jsonEncode(authUser.toJson()));
     state = authUser;
   }
 

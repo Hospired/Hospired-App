@@ -5,7 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'backend-api/init_supabase.dart';
 import 'notifications_service.dart';
 import 'pages/login_page.dart';
-import 'pages/home_page.dart';
+import 'pages/home/home_page.dart';
 import 'pages/start_page.dart';
 import 'pages/setup_user_page.dart';
 import 'providers/init_hive.dart';

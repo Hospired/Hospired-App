@@ -2,18 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../colors.dart';
-import '../providers/auth_user.dart';
-import '../providers/app_user.dart';
-import '../text_styles.dart';
+import '../../breakpoints.dart';
+import '../../colors.dart';
+import '../../providers/auth_user.dart';
+import '../../providers/app_user.dart';
+import '../../text_styles.dart';
+import 'side_nav_bar.dart';
+import 'bottom_nav_bar.dart';
 
-import 'appointment_page.dart';
-import 'chat_bot_page.dart';
-import 'map_page.dart';
-import 'pathologies_page.dart';
-import 'profile_page.dart';
-import 'treatment_page.dart';
-import 'setup_user_page.dart';
+import '../appointment_page.dart';
+import '../chat_bot_page.dart';
+import '../map_page.dart';
+import '../pathologies_page.dart';
+import '../profile_page.dart';
+import '../treatment_page.dart';
+import '../setup_user_page.dart';
 
 class HomePage extends HookConsumerWidget {
   const HomePage({super.key});
@@ -24,6 +27,9 @@ class HomePage extends HookConsumerWidget {
     final loadingError = useState<bool>(false);
     final appUser = ref.watch(appUserProvider);
     final authUser = ref.watch(authUserProvider);
+    final previousAuthUser = usePrevious(authUser);
+
+    final selectedNavIndex = useState<int>(0);
 
     final fetchAppUser = useCallback(() async {
       if (authUser != null) {
@@ -44,15 +50,26 @@ class HomePage extends HookConsumerWidget {
         } finally {
           loading.value = false;
         }
-      } else {
-        // the authUser is null => go to login again
-        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
       }
-    }, []);
+    }, [authUser]);
 
     useEffect(() {
       fetchAppUser();
       return;
+    }, [fetchAppUser]);
+
+    // Navigate to login if authUser becomes null (session expired)
+    useEffect(() {
+      if (previousAuthUser != null && authUser == null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Navigator.pushNamedAndRemoveUntil(context, '/login', (_) => false);
+        });
+      }
+      return null;
+    }, [authUser]);
+
+    final onSelectNavigationIndex = useCallback((int index) {
+      selectedNavIndex.value = index;
     }, []);
 
     if ((appUser == null) && (loading.value || loadingError.value)) {
@@ -94,14 +111,37 @@ class HomePage extends HookConsumerWidget {
       );
     }
 
-    return Scaffold(
-      body: Column(
-        children: [
-          Text(appUser?.toString() ?? "No app user"),
-          Text(authUser?.toString() ?? "No auth user"),
-        ],
-      ),
-    );
+    return MediaQuery.of(context).size.width > Breakpoint.lg
+        ? Scaffold(
+            body: Row(
+              children: [
+                SideNavBar(
+                  selectedIndex: selectedNavIndex.value,
+                  onTap: (index) => onSelectNavigationIndex(index),
+                ),
+                Expanded(
+                  child: Column(
+                    children: [
+                      Text(appUser?.toString() ?? "No app user"),
+                      Text(authUser?.toString() ?? "No auth user"),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          )
+        : Scaffold(
+            body: Column(
+              children: [
+                Text(appUser?.toString() ?? "No app user"),
+                Text(authUser?.toString() ?? "No auth user"),
+              ],
+            ),
+            bottomNavigationBar: BottomNavBar(
+              selectedIndex: selectedNavIndex.value,
+              onTap: (index) => onSelectNavigationIndex(index),
+            ),
+          );
   }
 }
 

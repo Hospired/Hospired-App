@@ -56,8 +56,24 @@ class AppTheme {
     ),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       selectedItemColor: primaryColor,
-      unselectedItemColor: Colors.grey,
-      backgroundColor: Colors.white,
+      unselectedItemColor: HospiredColors.gray,
+      backgroundColor: HospiredColors.white,
+    ),
+    navigationRailTheme: NavigationRailThemeData(
+      backgroundColor: HospiredColors.white,
+      selectedIconTheme: const IconThemeData(
+        color: HospiredColors.primaryLight,
+      ),
+      unselectedIconTheme: const IconThemeData(color: HospiredColors.gray),
+      selectedLabelTextStyle: HospiredTextStyle.body2.copyWith(
+        color: HospiredColors.primaryLight,
+      ),
+      unselectedLabelTextStyle: HospiredTextStyle.body1.copyWith(
+        color: HospiredColors.gray,
+      ),
+      useIndicator: true,
+      indicatorColor: HospiredColors.white,
+      minWidth: 112,
     ),
   );
 }
