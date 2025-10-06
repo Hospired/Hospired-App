@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../backend-api/api_service.dart';
-import '../theme.dart';
+import '../colors.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -34,7 +34,7 @@ class _LoginPageState extends State<LoginPage> {
 
       Navigator.pushReplacementNamed(context, '/home');
     } catch (e) {
-      setState(() => error = "Cédula o contraseña incorrecta");
+      setState(() => error = "Correo electrónico o contraseña incorrecta");
     } finally {
       setState(() => loading = false);
     }
@@ -47,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
       body: Center(
         child: Container(
           padding: const EdgeInsets.all(16),
-          constraints: const BoxConstraints(maxWidth: 480),
+          constraints: const BoxConstraints(maxWidth: 560),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -55,6 +55,7 @@ class _LoginPageState extends State<LoginPage> {
             children: [
               TextField(
                 controller: emailController,
+                onChanged: (value) => setState(() => error = ""),
                 readOnly: loading,
                 decoration: const InputDecoration(
                   labelText: "Correo Electrónico",
@@ -67,35 +68,26 @@ class _LoginPageState extends State<LoginPage> {
                 controller: passwordController,
                 obscureText: true,
                 readOnly: loading,
+                onChanged: (value) => setState(() => error = ""),
                 decoration: const InputDecoration(
                   labelText: "Contraseña",
                   border: OutlineInputBorder(),
                 ),
+                onSubmitted: (value) => _login(context),
               ),
               const SizedBox(height: 16),
-              loading
-                  ? const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(8),
-                        child: CircularProgressIndicator(
-                          constraints: BoxConstraints(
-                            minWidth: 48,
-                            maxWidth: 48,
-                            minHeight: 48,
-                            maxHeight: 48,
-                          ),
-                        ),
-                      ),
-                    )
-                  : ElevatedButton(
-                      onPressed: () => _login(context),
-                      child: const Text("Ingresar"),
-                    ),
-              if (error.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: Text(error, style: const TextStyle(color: Colors.red)),
+              ElevatedButton(
+                onPressed: loading ? null : () => _login(context),
+                child: const Text("Ingresar"),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  error,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: HospiredColors.danger),
                 ),
+              ),
             ],
           ),
         ),
