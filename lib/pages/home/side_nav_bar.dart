@@ -24,13 +24,13 @@ class SideNavBar extends StatelessWidget {
         ),
         NavigationRailDestination(
           padding: EdgeInsets.symmetric(vertical: 8),
-          icon: Icon(Icons.medical_services),
-          label: Text('Tratamiento'),
+          icon: Icon(Icons.calendar_today),
+          label: Text('Citas'),
         ),
         NavigationRailDestination(
           padding: EdgeInsets.symmetric(vertical: 8),
-          icon: Icon(Icons.calendar_today),
-          label: Text('Citas'),
+          icon: Icon(Icons.medical_services),
+          label: Text('Tratamiento'),
         ),
         NavigationRailDestination(
           padding: EdgeInsets.symmetric(vertical: 8),

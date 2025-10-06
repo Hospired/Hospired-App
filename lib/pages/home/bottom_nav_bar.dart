@@ -23,12 +23,12 @@ class BottomNavBar extends StatelessWidget {
           label: 'Dashboard',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.medical_services),
-          label: 'Tratamiento',
-        ),
-        BottomNavigationBarItem(
           icon: Icon(Icons.calendar_today),
           label: 'Citas',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.medical_services),
+          label: 'Tratamiento',
         ),
         BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
       ],

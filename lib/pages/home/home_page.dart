@@ -122,7 +122,7 @@ class HomePage extends HookConsumerWidget {
                 ),
                 Expanded(
                   child: selectedNavIndex.value == 0
-                      ? DashboardPage()
+                      ? DashboardPage(onSelectNavIndex: onSelectNavigationIndex)
                       : Column(
                           children: [
                             Text(appUser?.toString() ?? "No app user"),
@@ -135,7 +135,7 @@ class HomePage extends HookConsumerWidget {
           )
         : Scaffold(
             body: selectedNavIndex.value == 0
-                ? DashboardPage()
+                ? DashboardPage(onSelectNavIndex: onSelectNavigationIndex)
                 : Column(
                     children: [
                       Text(appUser?.toString() ?? "No app user"),
