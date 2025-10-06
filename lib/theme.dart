@@ -60,6 +60,7 @@ class AppTheme {
       backgroundColor: HospiredColors.white,
     ),
     navigationRailTheme: NavigationRailThemeData(
+      elevation: 2,
       backgroundColor: HospiredColors.white,
       selectedIconTheme: const IconThemeData(
         color: HospiredColors.primaryLight,
@@ -74,6 +75,12 @@ class AppTheme {
       useIndicator: true,
       indicatorColor: HospiredColors.white,
       minWidth: 112,
+    ),
+    cardTheme: CardThemeData(
+      color: HospiredColors.white,
+      margin: const EdgeInsets.all(0),
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
     ),
   );
 }

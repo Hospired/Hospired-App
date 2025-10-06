@@ -7,8 +7,9 @@ import '../../colors.dart';
 import '../../providers/auth_user.dart';
 import '../../providers/app_user.dart';
 import '../../text_styles.dart';
-import 'side_nav_bar.dart';
+import '../dashboard/dashboard_page.dart';
 import 'bottom_nav_bar.dart';
+import 'side_nav_bar.dart';
 
 import '../appointment_page.dart';
 import '../chat_bot_page.dart';
@@ -120,23 +121,27 @@ class HomePage extends HookConsumerWidget {
                   onTap: (index) => onSelectNavigationIndex(index),
                 ),
                 Expanded(
-                  child: Column(
-                    children: [
-                      Text(appUser?.toString() ?? "No app user"),
-                      Text(authUser?.toString() ?? "No auth user"),
-                    ],
-                  ),
+                  child: selectedNavIndex.value == 0
+                      ? DashboardPage()
+                      : Column(
+                          children: [
+                            Text(appUser?.toString() ?? "No app user"),
+                            Text(authUser?.toString() ?? "No auth user"),
+                          ],
+                        ),
                 ),
               ],
             ),
           )
         : Scaffold(
-            body: Column(
-              children: [
-                Text(appUser?.toString() ?? "No app user"),
-                Text(authUser?.toString() ?? "No auth user"),
-              ],
-            ),
+            body: selectedNavIndex.value == 0
+                ? DashboardPage()
+                : Column(
+                    children: [
+                      Text(appUser?.toString() ?? "No app user"),
+                      Text(authUser?.toString() ?? "No auth user"),
+                    ],
+                  ),
             bottomNavigationBar: BottomNavBar(
               selectedIndex: selectedNavIndex.value,
               onTap: (index) => onSelectNavigationIndex(index),
