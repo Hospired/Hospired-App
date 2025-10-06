@@ -94,7 +94,14 @@ class HomePage extends HookConsumerWidget {
       );
     }
 
-    return Scaffold(body: const Column(children: []));
+    return Scaffold(
+      body: Column(
+        children: [
+          Text(appUser?.toString() ?? "No app user"),
+          Text(authUser?.toString() ?? "No auth user"),
+        ],
+      ),
+    );
   }
 }
 

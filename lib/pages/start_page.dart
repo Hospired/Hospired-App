@@ -10,17 +10,6 @@ class StartPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    /*
-    final checkSession = useCallback(() {
-      final authUserRes = ref.read(authUserProvider.notifier).checkSession();
-      if (authUserRes != null) {
-        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-      } else {
-        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-      }
-    }, []);
-    */
-
     useEffect(() {
       Future.microtask(() {
         final authUserRes = ref.read(authUserProvider.notifier).checkSession();

@@ -21,23 +21,23 @@ class AppUserRes {
 
   factory AppUserRes.fromJson(Map<String, dynamic> json) => AppUserRes(
     id: json["id"],
-    firstName: json["firstName"],
-    secondName: json["secondName"],
-    firstLastName: json["firstLastName"],
-    secondLastName: json["secondLastName"],
-    dateOfBirth: json["dateOfBirth"] == null
+    firstName: json["first_name"],
+    secondName: json["second_name"],
+    firstLastName: json["first_last_name"],
+    secondLastName: json["second_last_name"],
+    dateOfBirth: json["date_of_birth"] == null
         ? null
-        : DateTime.parse(json["dateOfBirth"]),
+        : DateTime.parse(json["date_of_birth"]),
     avatar: json["avatar"],
   );
 
   Map<String, dynamic> toJson() => {
     "id": id,
-    "firstName": firstName,
-    "secondName": secondName,
-    "firstLastName": firstLastName,
-    "secondLastName": secondLastName,
-    "dateOfBirth": dateOfBirth?.toIso8601String(),
+    "first_name": firstName,
+    "second_name": secondName,
+    "first_last_name": firstLastName,
+    "second_last_name": secondLastName,
+    "date_of_birth": dateOfBirth?.toIso8601String(),
     "avatar": avatar,
   };
 
@@ -107,4 +107,82 @@ class AuthUserRes {
 
   @override
   int get hashCode => Object.hashAll([id, email]);
+}
+
+class CreateAppUserReq {
+  CreateAppUserReq({
+    required this.id,
+    required this.firstName,
+    this.secondName,
+    required this.firstLastName,
+    this.secondLastName,
+    this.dateOfBirth,
+  });
+
+  String id;
+  String firstName;
+  String? secondName;
+  String firstLastName;
+  String? secondLastName;
+  DateTime? dateOfBirth;
+
+  factory CreateAppUserReq.fromJson(Map<String, dynamic> json) =>
+      CreateAppUserReq(
+        id: json["id"],
+        firstName: json["first_name"],
+        secondName: json["second_name"],
+        firstLastName: json["first_last_name"],
+        secondLastName: json["second_last_name"],
+        dateOfBirth: json["date_of_birth"] == null
+            ? null
+            : DateTime.parse(json["date_of_birth"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "first_name": firstName,
+    "second_name": secondName,
+    "first_last_name": firstLastName,
+    "second_last_name": secondLastName,
+    "date_of_birth": dateOfBirth?.toIso8601String(),
+  };
+
+  CreateAppUserReq copyWith({
+    String? id,
+    String? firstName,
+    String? secondName,
+    String? firstLastName,
+    String? secondLastName,
+    DateTime? dateOfBirth,
+  }) {
+    return CreateAppUserReq(
+      id: id ?? this.id,
+      firstName: firstName ?? this.firstName,
+      secondName: secondName ?? this.secondName,
+      firstLastName: firstLastName ?? this.firstLastName,
+      secondLastName: secondLastName ?? this.secondLastName,
+      dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AppUserRes &&
+          other.id == id &&
+          other.firstName == firstName &&
+          other.secondName == secondName &&
+          other.firstLastName == firstLastName &&
+          other.secondLastName == secondLastName &&
+          other.dateOfBirth == dateOfBirth;
+
+  @override
+  int get hashCode => Object.hashAll([
+    id,
+    firstName,
+    secondName,
+    firstLastName,
+    secondLastName,
+    dateOfBirth,
+  ]);
 }

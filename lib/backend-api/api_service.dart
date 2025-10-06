@@ -21,6 +21,19 @@ class ApiService {
     }
   }
 
+  static Future<AppUserRes> createAppUser(CreateAppUserReq req) async {
+    try {
+      final Map<String, dynamic> response = await _supabase
+          .from('app_users')
+          .insert(req.toJson())
+          .select()
+          .single();
+      return AppUserRes.fromJson(response);
+    } catch (e) {
+      throw Exception('Failed to create app user: $e');
+    }
+  }
+
   static Future<AppUserRes?> getAppUser(String id) async {
     try {
       final Map<String, dynamic>? response = await _supabase
