@@ -4,10 +4,11 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'backend-api/init_supabase.dart';
 import 'notifications_service.dart';
-import 'pages/login_page.dart';
+import 'pages/appointments/request_appointment.dart';
 import 'pages/home/home_page.dart';
-import 'pages/start_page.dart';
+import 'pages/login_page.dart';
 import 'pages/setup_user_page.dart';
+import 'pages/start_page.dart';
 import 'providers/init_hive.dart';
 import 'theme.dart';
 
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginPage(),
         '/setup-user': (context) => const SetupUserPage(),
         '/home': (context) => const HomePage(),
+        '/home/request-appointment': (context) => const RequestAppointment(),
       },
       debugShowCheckedModeBanner: false,
 

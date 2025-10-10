@@ -14,7 +14,7 @@ final municipalitiesProvider =
 class MunicipalitiesNotifier extends StateNotifier<List<MunicipalityRes>?> {
   MunicipalitiesNotifier() : super(null) {
     final municipalities = Hive.box("general").get("municipalities");
-    if (municipalities != null || municipalities.isNotEmpty) {
+    if (municipalities != null) {
       final municipalitiesJson = jsonDecode(municipalities);
       try {
         state = List<MunicipalityRes>.from(

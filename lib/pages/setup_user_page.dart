@@ -62,11 +62,12 @@ class SetupUserPage extends HookConsumerWidget {
 
     final showIncompleteUserInputsDialog = useCallback((
       BuildContext context,
+      String infoText,
     ) async {
       await warningDialog(
         context: context,
         title: "Datos incompletos",
-        infoText: "Debe ingresar mínimo un nombre y un apellido.",
+        infoText: infoText,
       );
     }, []);
 
@@ -76,10 +77,6 @@ class SetupUserPage extends HookConsumerWidget {
       String firstLastName = firstLastNameController.text;
       String secondLastName = secondLastNameController.text;
 
-      if (firstName.isEmpty || firstLastName.isEmpty) {
-        await showIncompleteUserInputsDialog(context);
-        return;
-      }
       if (authUser != null) {
         creatingUser.value = true;
         error.value = "";
@@ -118,12 +115,27 @@ class SetupUserPage extends HookConsumerWidget {
       }
     }, []);
 
-    final continueButtonPressed = useCallback((BuildContext context) {
+    final continueButtonPressed = useCallback((BuildContext context) async {
       if (creatingUser.value) {
         return null;
       } else if (setupStep.value == 0) {
+        if (firstNameController.text.isEmpty ||
+            firstLastNameController.text.isEmpty) {
+          await showIncompleteUserInputsDialog(
+            context,
+            "Debe ingresar mínimo un nombre y un apellido.",
+          );
+          return;
+        }
         setupStep.value = 1;
       } else {
+        if (nationalIdController.text.isEmpty) {
+          await showIncompleteUserInputsDialog(
+            context,
+            "Debe ingresar su número de Cédula.",
+          );
+          return;
+        }
         callCreateAppUser(context);
       }
     }, []);

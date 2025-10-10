@@ -7,11 +7,11 @@ import '../../colors.dart';
 import '../../providers/auth_user.dart';
 import '../../providers/app_user.dart';
 import '../../text_styles.dart';
+import '../appointments/appointments_page.dart';
 import '../dashboard/dashboard_page.dart';
 import 'bottom_nav_bar.dart';
 import 'side_nav_bar.dart';
 
-import '../appointment_page.dart';
 import '../chat_bot_page.dart';
 import '../map_page.dart';
 import '../pathologies_page.dart';
@@ -123,12 +123,14 @@ class HomePage extends HookConsumerWidget {
                 Expanded(
                   child: selectedNavIndex.value == 0
                       ? DashboardPage(onSelectNavIndex: onSelectNavigationIndex)
-                      : Column(
-                          children: [
-                            Text(appUser?.toString() ?? "No app user"),
-                            Text(authUser?.toString() ?? "No auth user"),
-                          ],
-                        ),
+                      : (selectedNavIndex.value == 1
+                            ? AppointmentsPage()
+                            : Column(
+                                children: [
+                                  Text(appUser?.toString() ?? "No app user"),
+                                  Text(authUser?.toString() ?? "No auth user"),
+                                ],
+                              )),
                 ),
               ],
             ),
@@ -136,12 +138,14 @@ class HomePage extends HookConsumerWidget {
         : Scaffold(
             body: selectedNavIndex.value == 0
                 ? DashboardPage(onSelectNavIndex: onSelectNavigationIndex)
-                : Column(
-                    children: [
-                      Text(appUser?.toString() ?? "No app user"),
-                      Text(authUser?.toString() ?? "No auth user"),
-                    ],
-                  ),
+                : (selectedNavIndex.value == 1
+                      ? AppointmentsPage()
+                      : Column(
+                          children: [
+                            Text(appUser?.toString() ?? "No app user"),
+                            Text(authUser?.toString() ?? "No auth user"),
+                          ],
+                        )),
             bottomNavigationBar: BottomNavBar(
               selectedIndex: selectedNavIndex.value,
               onTap: (index) => onSelectNavigationIndex(index),
