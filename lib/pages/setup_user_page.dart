@@ -7,6 +7,8 @@ import '../backend-api/dtos.dart';
 import '../colors.dart';
 import '../providers/app_user.dart';
 import '../providers/auth_user.dart';
+import '../providers/municipalities.dart';
+import '../providers/patient.dart';
 import '../text_styles.dart';
 import '../ui/alert_dialogs.dart';
 
@@ -16,9 +18,11 @@ class SetupUserPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authUser = ref.watch(authUserProvider);
+    final municipalities = ref.watch(municipalitiesProvider);
 
     final creatingUser = useState<bool>(false);
     final error = useState<String>("");
+    final setupStep = useState<int>(0); // 0: setup app_user, 1: setup patient
 
     final TextEditingController firstNameController =
         useTextEditingController();
@@ -28,6 +32,16 @@ class SetupUserPage extends HookConsumerWidget {
         useTextEditingController();
     final TextEditingController secondLastNameController =
         useTextEditingController();
+    final TextEditingController nationalIdController =
+        useTextEditingController();
+    final TextEditingController inssIdController = useTextEditingController();
+    final TextEditingController phoneNumberController =
+        useTextEditingController();
+    final TextEditingController districtController = useTextEditingController();
+    final TextEditingController occupationController =
+        useTextEditingController();
+    final selectedMunicipality = useState<MunicipalityRes?>(null);
+
     final dateOfBirth = useState<DateTime?>(null);
 
     Future<void> pickDateOfBirth(BuildContext context) async {
@@ -80,7 +94,19 @@ class SetupUserPage extends HookConsumerWidget {
               dateOfBirth: dateOfBirth.value,
             ),
           );
+          final PatientRes patient = await ApiService.createPatient(
+            CreatePatientReq(
+              appUserId: createdUser.id,
+              nationalId: nationalIdController.text,
+              municipalityId: selectedMunicipality.value!.id,
+              inssId: int.parse(inssIdController.text),
+              phoneNumber: phoneNumberController.text,
+              occupation: occupationController.text,
+              neighborHood: districtController.text,
+            ),
+          );
           ref.read(appUserProvider.notifier).set(createdUser);
+          ref.read(patientProvider.notifier).set(patient);
           Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
         } catch (err) {
           error.value = err.toString();
@@ -90,6 +116,21 @@ class SetupUserPage extends HookConsumerWidget {
       } else {
         Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
       }
+    }, []);
+
+    final continueButtonPressed = useCallback((BuildContext context) {
+      if (creatingUser.value) {
+        return null;
+      } else if (setupStep.value == 0) {
+        setupStep.value = 1;
+      } else {
+        callCreateAppUser(context);
+      }
+    }, []);
+
+    useEffect(() {
+      ref.read(municipalitiesProvider.notifier).fetch();
+      return;
     }, []);
 
     return Scaffold(
@@ -102,7 +143,18 @@ class SetupUserPage extends HookConsumerWidget {
             children: [
               Row(
                 children: [
-                  Text("Configurar Usuario", style: HospiredTextStyle.title4),
+                  if (setupStep.value == 1) ...[
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      onPressed: () => setupStep.value = 0,
+                    ),
+                  ],
+                  Text(
+                    setupStep.value == 0
+                        ? "Configurar Usuario"
+                        : "Datos del Paciente",
+                    style: HospiredTextStyle.title4,
+                  ),
                   const Spacer(),
                 ],
               ),
@@ -122,82 +174,180 @@ class SetupUserPage extends HookConsumerWidget {
               Expanded(
                 child: ListView(
                   children: [
-                    Text("Nombres", style: HospiredTextStyle.title3),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: firstNameController,
-                      readOnly: creatingUser.value,
-                      onChanged: (value) => error.value = "",
-                      decoration: const InputDecoration(
-                        labelText: "Primer Nombre",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: secondNameController,
-                      readOnly: creatingUser.value,
-                      onChanged: (value) => error.value = "",
-                      decoration: const InputDecoration(
-                        labelText: "Segundo Nombre",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Text("Apellidos", style: HospiredTextStyle.title3),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: firstLastNameController,
-                      readOnly: creatingUser.value,
-                      onChanged: (value) => error.value = "",
-                      decoration: const InputDecoration(
-                        labelText: "Primer Apellido",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: secondLastNameController,
-                      readOnly: creatingUser.value,
-                      onChanged: (value) => error.value = "",
-                      decoration: const InputDecoration(
-                        labelText: "Segundo Apellido",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Text(
-                      "Fecha de nacimiento",
-                      style: HospiredTextStyle.title3,
-                    ),
-                    const SizedBox(height: 8),
-                    InkWell(
-                      onTap: () => pickDateOfBirth(context),
-                      child: InputDecorator(
-                        decoration: InputDecoration(
-                          labelText: dateOfBirth.value != null
-                              ? "Fecha de nacimiento"
-                              : "",
-                          border: const OutlineInputBorder(),
+                    if (setupStep.value == 0) ...[
+                      Text("Nombres", style: HospiredTextStyle.title3),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: firstNameController,
+                        readOnly: creatingUser.value,
+                        onChanged: (value) => error.value = "",
+                        decoration: const InputDecoration(
+                          hintText: "Juan",
+                          labelText: "Primer Nombre *",
+                          border: OutlineInputBorder(),
                         ),
-                        child: Text(
-                          dateOfBirth.value != null
-                              ? "${dateOfBirth.value!.day}/${dateOfBirth.value!.month}/${dateOfBirth.value!.year}"
-                              : "Seleccionar",
-                          style: TextStyle(
-                            color: dateOfBirth.value != null
-                                ? Colors.black
-                                : Colors.grey[600],
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: secondNameController,
+                        readOnly: creatingUser.value,
+                        onChanged: (value) => error.value = "",
+                        decoration: const InputDecoration(
+                          hintText: "Carlos",
+                          labelText: "Segundo Nombre",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Text("Apellidos", style: HospiredTextStyle.title3),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: firstLastNameController,
+                        readOnly: creatingUser.value,
+                        onChanged: (value) => error.value = "",
+                        decoration: const InputDecoration(
+                          hintText: "Rodriguez",
+                          labelText: "Primer Apellido *",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: secondLastNameController,
+                        readOnly: creatingUser.value,
+                        onChanged: (value) => error.value = "",
+                        decoration: const InputDecoration(
+                          hintText: "Cuaresma",
+                          labelText: "Segundo Apellido",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Text(
+                        "Fecha de nacimiento",
+                        style: HospiredTextStyle.title3,
+                      ),
+                      const SizedBox(height: 8),
+                      InkWell(
+                        onTap: () => pickDateOfBirth(context),
+                        child: InputDecorator(
+                          decoration: InputDecoration(
+                            labelText: dateOfBirth.value != null
+                                ? "Fecha de nacimiento"
+                                : "",
+                            border: const OutlineInputBorder(),
+                          ),
+                          child: Text(
+                            dateOfBirth.value != null
+                                ? "${dateOfBirth.value!.day}/${dateOfBirth.value!.month}/${dateOfBirth.value!.year}"
+                                : "Seleccionar",
+                            style: TextStyle(
+                              color: dateOfBirth.value != null
+                                  ? Colors.black
+                                  : Colors.grey[600],
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                    ] else ...[
+                      Text(
+                        "Cédula y Seguro Social",
+                        style: HospiredTextStyle.title3,
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: nationalIdController,
+                        readOnly: creatingUser.value,
+                        onChanged: (value) => error.value = "",
+                        decoration: const InputDecoration(
+                          labelText: "Cédula *",
+                          border: OutlineInputBorder(),
+                          hintText: "123-456789-0001A",
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: inssIdController,
+                        readOnly: creatingUser.value,
+                        onChanged: (value) => error.value = "",
+                        decoration: const InputDecoration(
+                          labelText: "Número INSS",
+                          hintText: "12345678",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Text("Dirección", style: HospiredTextStyle.title3),
+                      const SizedBox(height: 8),
+                      DropdownButtonFormField<MunicipalityRes>(
+                        decoration: const InputDecoration(
+                          labelText: "Municipio",
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 16,
+                          ),
+                        ),
+                        initialValue: selectedMunicipality.value,
+                        onChanged: (MunicipalityRes? municipality) {
+                          selectedMunicipality.value = municipality;
+                        },
+                        items:
+                            municipalities
+                                ?.map<DropdownMenuItem<MunicipalityRes>>((
+                                  MunicipalityRes municipality,
+                                ) {
+                                  return DropdownMenuItem<MunicipalityRes>(
+                                    value: municipality,
+                                    child: Text(municipality.name),
+                                  );
+                                })
+                                .toList() ??
+                            [],
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: districtController,
+                        readOnly: creatingUser.value,
+                        onChanged: (value) => error.value = "",
+                        decoration: const InputDecoration(
+                          labelText: "Residencial, Barrio, Comarca o Distrito",
+                          hintText: "Bosques de Altamira",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Text(
+                        "Ocupación y contacto",
+                        style: HospiredTextStyle.title3,
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: occupationController,
+                        readOnly: creatingUser.value,
+                        onChanged: (value) => error.value = "",
+                        decoration: const InputDecoration(
+                          labelText: "Ocupación",
+                          hintText: "Fisioterapeuta",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: phoneNumberController,
+                        readOnly: creatingUser.value,
+                        onChanged: (value) => error.value = "",
+                        decoration: const InputDecoration(
+                          labelText: "Número de teléfono",
+                          hintText: "8512 3456",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 32),
                     ElevatedButton(
-                      onPressed: creatingUser.value
-                          ? null
-                          : () => callCreateAppUser(context),
-                      child: const Text("Continuar"),
+                      onPressed: () => continueButtonPressed(context),
+                      child: Text(setupStep.value == 0 ? "Continuar" : "Listo"),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(16),

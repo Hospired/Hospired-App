@@ -34,6 +34,19 @@ class ApiService {
     }
   }
 
+  static Future<PatientRes> createPatient(CreatePatientReq req) async {
+    try {
+      final Map<String, dynamic> response = await _supabase
+          .from('patients')
+          .insert(req.toJson())
+          .select()
+          .single();
+      return PatientRes.fromJson(response);
+    } catch (e) {
+      throw Exception('Failed to create patient: $e');
+    }
+  }
+
   static Future<AppUserRes?> getAppUser(String id) async {
     try {
       final Map<String, dynamic>? response = await _supabase
@@ -47,6 +60,36 @@ class ApiService {
       return null;
     } catch (e) {
       throw Exception('Failed to fetch app user: $e');
+    }
+  }
+
+  static Future<List<MunicipalityRes>?> getMunicipalities() async {
+    try {
+      final List<dynamic> response = await _supabase
+          .from('municipalities')
+          .select();
+      if (response.isNotEmpty) {
+        return response.map((json) => MunicipalityRes.fromJson(json)).toList();
+      }
+      return [];
+    } catch (e) {
+      throw Exception('Failed to fetch municipalities: $e');
+    }
+  }
+
+  static Future<PatientRes?> getPatient(String appUserId) async {
+    try {
+      final Map<String, dynamic>? response = await _supabase
+          .from('patients')
+          .select()
+          .eq('app_user_id', appUserId)
+          .maybeSingle();
+      if (response != null) {
+        return PatientRes.fromJson(response);
+      }
+      return null;
+    } catch (e) {
+      throw Exception('Failed to fetch patient: $e');
     }
   }
 
