@@ -1,5 +1,112 @@
 // Data Transfer Objects (DTOs)
 
+class AppointmentRes {
+  AppointmentRes({
+    required this.id,
+    required this.patientId,
+    this.physicianId,
+    required this.motive,
+    this.specialty,
+    required this.status,
+    required this.start,
+    required this.end,
+    this.calendarItemId,
+    this.facilityUnitId,
+  });
+
+  int id;
+  int patientId;
+  int? physicianId;
+  String motive;
+  String? specialty;
+  String status;
+  DateTime start;
+  DateTime end;
+  int? calendarItemId;
+  int? facilityUnitId;
+
+  factory AppointmentRes.fromJson(Map<String, dynamic> json) => AppointmentRes(
+    id: json["id"],
+    patientId: json["patient_id"],
+    physicianId: json["physician_id"],
+    motive: json["motive"],
+    specialty: json["specialty"],
+    status: json["status"],
+    start: DateTime.parse(json["start"]),
+    end: DateTime.parse(json["end"]),
+    calendarItemId: json["calendar_item_id"],
+    facilityUnitId: json["facility_unit_id"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "patient_id": patientId,
+    "physician_id": physicianId,
+    "motive": motive,
+    "specialty": specialty,
+    "status": status,
+    "start": start.toIso8601String(),
+    "end": end.toIso8601String(),
+    "calendar_item_id": calendarItemId,
+    "facility_unit_id": facilityUnitId,
+  };
+
+  AppointmentRes copyWith({
+    int? id,
+    int? patientId,
+    int? physicianId,
+    String? motive,
+    String? specialty,
+    String? status,
+    DateTime? start,
+    DateTime? end,
+    int? calendarItemId,
+    int? facilityUnitId,
+  }) {
+    return AppointmentRes(
+      id: id ?? this.id,
+      patientId: patientId ?? this.patientId,
+      physicianId: physicianId ?? this.physicianId,
+      motive: motive ?? this.motive,
+      specialty: specialty ?? this.specialty,
+      status: status ?? this.status,
+      start: start ?? this.start,
+      end: end ?? this.end,
+      calendarItemId: calendarItemId ?? this.calendarItemId,
+      facilityUnitId: facilityUnitId ?? this.facilityUnitId,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AppointmentRes &&
+          other.id == id &&
+          other.patientId == patientId &&
+          other.physicianId == physicianId &&
+          other.motive == motive &&
+          other.specialty == specialty &&
+          other.status == status &&
+          other.start == start &&
+          other.end == end &&
+          other.calendarItemId == calendarItemId &&
+          other.facilityUnitId == facilityUnitId;
+
+  @override
+  int get hashCode => Object.hashAll([
+    id,
+    patientId,
+    physicianId,
+    motive,
+    specialty,
+    status,
+    start,
+    end,
+    calendarItemId,
+    facilityUnitId,
+  ]);
+}
+
 class AppUserRes {
   AppUserRes({
     required this.id,

@@ -6,6 +6,7 @@ import '../../breakpoints.dart';
 import '../../colors.dart';
 import '../../providers/auth_user.dart';
 import '../../providers/app_user.dart';
+import '../../providers/patient.dart';
 import '../../text_styles.dart';
 import '../appointments/appointments_page.dart';
 import '../dashboard/dashboard_page.dart';
@@ -26,6 +27,7 @@ class HomePage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final loading = useState<bool>(true);
     final loadingError = useState<bool>(false);
+    final patient = ref.watch(patientProvider);
     final appUser = ref.watch(appUserProvider);
     final authUser = ref.watch(authUserProvider);
     final previousAuthUser = usePrevious(authUser);
@@ -68,6 +70,11 @@ class HomePage extends HookConsumerWidget {
       }
       return null;
     }, [authUser]);
+
+    useEffect(() {
+      ref.read(patientProvider.notifier).fetch();
+      return;
+    }, []);
 
     final onSelectNavigationIndex = useCallback((int index) {
       selectedNavIndex.value = index;

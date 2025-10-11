@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../providers/app_user.dart';
+import '../../providers/patient.dart';
 import '../../text_styles.dart';
 import '../../breakpoints.dart';
 import 'next_appointment_card.dart';
@@ -15,9 +16,10 @@ class DashboardPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appUser = ref.watch(appUserProvider);
+    final patient = ref.watch(patientProvider);
 
     // Fallback, this should never happen as appUser is controlled by the parend widgets
-    if (appUser == null) {
+    if (appUser == null || patient == null) {
       return Material();
     }
 
@@ -33,7 +35,7 @@ class DashboardPage extends HookConsumerWidget {
               ],
             ),
             const SizedBox(height: 8),
-            UserSummaryCard(appUser: appUser),
+            UserSummaryCard(appUser: appUser, patient: patient),
             const SizedBox(height: 16),
             NextAppointmentCard(onTap: () => onSelectNavIndex(1)),
           ],

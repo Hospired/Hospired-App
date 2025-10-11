@@ -37,6 +37,7 @@ class RequestAppointment extends HookConsumerWidget {
                   color: HospiredColors.danger,
                   size: 64,
                 ),
+                const SizedBox(height: 16),
                 Text(
                   'En este formulario puede solicitar una cita médica. Se le asignará el siguiente cupo disponible con el especialista y en el centro de atención que le corresponda, según el motivo que usted describa.\n\nEn casos de emergencia, dirígase al centro de salud más cercano, sin solicitar cita.',
                   textAlign: TextAlign.center,
@@ -45,7 +46,10 @@ class RequestAppointment extends HookConsumerWidget {
                 const SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: () => disclaimerShown.value = true,
-                  child: Text('Entendido', style: HospiredTextStyle.body3),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                    child: Text('Entendido', style: HospiredTextStyle.body3),
+                  ),
                 ),
                 const Spacer(),
               ],

@@ -4,9 +4,14 @@ import '../../backend-api/dtos.dart';
 import '../../text_styles.dart';
 
 class UserSummaryCard extends StatelessWidget {
-  const UserSummaryCard({super.key, required this.appUser});
+  const UserSummaryCard({
+    super.key,
+    required this.appUser,
+    required this.patient,
+  });
 
   final AppUserRes appUser;
+  final PatientRes patient;
 
   @override
   Widget build(BuildContext context) {
@@ -34,11 +39,13 @@ class UserSummaryCard extends StatelessWidget {
                 children: [
                   Text("Cédula", style: HospiredTextStyle.body2Bold),
                   const SizedBox(height: 2),
-                  Text("123-123456-0001A", style: HospiredTextStyle.body2),
+                  Text(patient.nationalId, style: HospiredTextStyle.body2),
                   const SizedBox(height: 12),
-                  Text("No INSS", style: HospiredTextStyle.body2Bold),
-                  const SizedBox(height: 2),
-                  Text("44123456", style: HospiredTextStyle.body2),
+                  if (patient.inssId != null) ...[
+                    Text("No INSS", style: HospiredTextStyle.body2Bold),
+                    const SizedBox(height: 2),
+                    Text("${patient.inssId}", style: HospiredTextStyle.body2),
+                  ],
                 ],
               ),
             ),

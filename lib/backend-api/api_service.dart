@@ -47,6 +47,27 @@ class ApiService {
     }
   }
 
+  static Future<List<AppointmentRes>?> getAppointmentsByPatientId(
+    int patientId,
+  ) async {
+    try {
+      final List<dynamic> response = await _supabase
+          .from('appointments')
+          .select()
+          .eq('patient_id', patientId);
+      if (response.isNotEmpty) {
+        return response
+            .map(
+              (json) => AppointmentRes.fromJson(json as Map<String, dynamic>),
+            )
+            .toList();
+      }
+      return [];
+    } catch (e) {
+      throw Exception('Failed to fetch apppointments by patient id: $e');
+    }
+  }
+
   static Future<AppUserRes?> getAppUser(String id) async {
     try {
       final Map<String, dynamic>? response = await _supabase
