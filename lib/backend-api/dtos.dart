@@ -20,8 +20,8 @@ class AppointmentRes {
   String motive;
   String? specialty;
   String status;
-  DateTime start;
-  DateTime end;
+  DateTime? start;
+  DateTime? end;
   int? calendarItemId;
   int? facilityUnitId;
 
@@ -32,8 +32,8 @@ class AppointmentRes {
     motive: json["motive"],
     specialty: json["specialty"],
     status: json["status"],
-    start: DateTime.parse(json["start"]),
-    end: DateTime.parse(json["end"]),
+    start: json["start"] != null ? DateTime.parse(json["start"]) : null,
+    end: json["end"] != null ? DateTime.parse(json["end"]) : null,
     calendarItemId: json["calendar_item_id"],
     facilityUnitId: json["facility_unit_id"],
   );
@@ -45,8 +45,8 @@ class AppointmentRes {
     "motive": motive,
     "specialty": specialty,
     "status": status,
-    "start": start.toIso8601String(),
-    "end": end.toIso8601String(),
+    "start": start?.toIso8601String(),
+    "end": end?.toIso8601String(),
     "calendar_item_id": calendarItemId,
     "facility_unit_id": facilityUnitId,
   };
@@ -214,6 +214,54 @@ class AuthUserRes {
 
   @override
   int get hashCode => Object.hashAll([id, email]);
+}
+
+class CreateAppointmentReq {
+  CreateAppointmentReq({
+    required this.patientId,
+    required this.motive,
+    required this.specialty,
+  });
+
+  int patientId;
+  String motive;
+  String specialty;
+
+  factory CreateAppointmentReq.fromJson(Map<String, dynamic> json) =>
+      CreateAppointmentReq(
+        patientId: json["patient_id"],
+        motive: json["motive"],
+        specialty: json["specialty"],
+      );
+
+  Map<String, dynamic> toJson() => {
+    "patient_id": patientId,
+    "motive": motive,
+    "specialty": specialty,
+  };
+
+  CreateAppointmentReq copyWith({
+    int? patientId,
+    String? motive,
+    String? specialty,
+  }) {
+    return CreateAppointmentReq(
+      patientId: patientId ?? this.patientId,
+      motive: motive ?? this.motive,
+      specialty: specialty ?? this.specialty,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CreateAppointmentReq &&
+          other.patientId == patientId &&
+          other.motive == motive &&
+          other.specialty == specialty;
+
+  @override
+  int get hashCode => Object.hashAll([patientId, motive, specialty]);
 }
 
 class CreateAppUserReq {

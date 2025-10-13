@@ -21,6 +21,21 @@ class ApiService {
     }
   }
 
+  static Future<AppointmentRes> createAppointment(
+    CreateAppointmentReq req,
+  ) async {
+    try {
+      final Map<String, dynamic> response = await _supabase
+          .from('appointments')
+          .insert(req.toJson())
+          .select()
+          .single();
+      return AppointmentRes.fromJson(response);
+    } catch (e) {
+      throw Exception('Failed to create appointment: $e');
+    }
+  }
+
   static Future<AppUserRes> createAppUser(CreateAppUserReq req) async {
     try {
       final Map<String, dynamic> response = await _supabase
