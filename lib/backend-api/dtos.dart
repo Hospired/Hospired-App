@@ -12,6 +12,7 @@ class AppointmentRes {
     required this.end,
     this.calendarItemId,
     this.facilityUnitId,
+    required this.createdAt,
   });
 
   int id;
@@ -24,6 +25,7 @@ class AppointmentRes {
   DateTime? end;
   int? calendarItemId;
   int? facilityUnitId;
+  DateTime createdAt;
 
   factory AppointmentRes.fromJson(Map<String, dynamic> json) => AppointmentRes(
     id: json["id"],
@@ -36,6 +38,7 @@ class AppointmentRes {
     end: json["end"] != null ? DateTime.parse(json["end"]) : null,
     calendarItemId: json["calendar_item_id"],
     facilityUnitId: json["facility_unit_id"],
+    createdAt: DateTime.parse(json["created_at"]),
   );
 
   Map<String, dynamic> toJson() => {
@@ -49,6 +52,7 @@ class AppointmentRes {
     "end": end?.toIso8601String(),
     "calendar_item_id": calendarItemId,
     "facility_unit_id": facilityUnitId,
+    "created_at": createdAt.toIso8601String(),
   };
 
   AppointmentRes copyWith({
@@ -62,6 +66,7 @@ class AppointmentRes {
     DateTime? end,
     int? calendarItemId,
     int? facilityUnitId,
+    DateTime? createdAt,
   }) {
     return AppointmentRes(
       id: id ?? this.id,
@@ -74,6 +79,7 @@ class AppointmentRes {
       end: end ?? this.end,
       calendarItemId: calendarItemId ?? this.calendarItemId,
       facilityUnitId: facilityUnitId ?? this.facilityUnitId,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 
@@ -90,7 +96,8 @@ class AppointmentRes {
           other.start == start &&
           other.end == end &&
           other.calendarItemId == calendarItemId &&
-          other.facilityUnitId == facilityUnitId;
+          other.facilityUnitId == facilityUnitId &&
+          other.createdAt == createdAt;
 
   @override
   int get hashCode => Object.hashAll([
@@ -104,6 +111,7 @@ class AppointmentRes {
     end,
     calendarItemId,
     facilityUnitId,
+    createdAt,
   ]);
 }
 
