@@ -21,7 +21,7 @@ Map<String, String> medicalSpecialties = {
 
 Map<String, String> appointmentStatus = {
   'requested': 'solicitado',
-  'scheduled': 'pendiente',
+  'scheduled': 'programado',
   'completed': 'completado',
   'canceled': 'cancelado',
   'no_show': 'no asistió',

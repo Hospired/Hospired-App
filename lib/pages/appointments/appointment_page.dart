@@ -96,9 +96,7 @@ class AppointmentPage extends HookConsumerWidget {
                 appointment.status == "requested"
                     ? "Solicitud # ${appointment.id}"
                     : "Cita # ${appointment.id}",
-                style: HospiredTextStyle.title4.copyWith(
-                  color: HospiredColors.primary,
-                ),
+                style: HospiredTextStyle.sectionTitle,
               ),
               const SizedBox(height: 24),
               Row(
