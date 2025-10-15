@@ -99,6 +99,38 @@ class ApiService {
     }
   }
 
+  static Future<FacilityUnitRes?> getFacilityUnit(int id) async {
+    try {
+      final Map<String, dynamic>? response = await _supabase
+          .from('facility_units')
+          .select()
+          .eq('id', id)
+          .maybeSingle();
+      if (response != null) {
+        return FacilityUnitRes.fromJson(response);
+      }
+      return null;
+    } catch (e) {
+      throw Exception('Failed to fetch facility unit: $e');
+    }
+  }
+
+  static Future<HealthcareFacilityRes?> getHealthcareFacility(int id) async {
+    try {
+      final Map<String, dynamic>? response = await _supabase
+          .from('healthcare_facilities')
+          .select()
+          .eq('id', id)
+          .maybeSingle();
+      if (response != null) {
+        return HealthcareFacilityRes.fromJson(response);
+      }
+      return null;
+    } catch (e) {
+      throw Exception('Failed to fetch healthcare facility: $e');
+    }
+  }
+
   static Future<List<MunicipalityRes>?> getMunicipalities() async {
     try {
       final List<dynamic> response = await _supabase

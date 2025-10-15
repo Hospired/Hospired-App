@@ -85,7 +85,11 @@ class AppointmentsPage extends HookConsumerWidget {
                     );
                   }
                   return AppointmentCard(
-                    onTap: () {},
+                    onTap: () => Navigator.pushNamed(
+                      context,
+                      '/home/appointment',
+                      arguments: requestedAppointments[index - 1],
+                    ),
                     appointment: requestedAppointments[index - 1],
                   );
                 },
@@ -124,7 +128,11 @@ class AppointmentsPage extends HookConsumerWidget {
                     );
                   }
                   return AppointmentCard(
-                    onTap: () {},
+                    onTap: () => Navigator.pushNamed(
+                      context,
+                      '/home/appointment',
+                      arguments: upcomingAppointments[index],
+                    ),
                     appointment: upcomingAppointments[index],
                   );
                 },
@@ -161,7 +169,11 @@ class AppointmentsPage extends HookConsumerWidget {
                     );
                   }
                   return AppointmentCard(
-                    onTap: () {},
+                    onTap: () => Navigator.pushNamed(
+                      context,
+                      '/home/appointment',
+                      arguments: pastAppointments[index],
+                    ),
                     appointment: pastAppointments[index],
                   );
                 },

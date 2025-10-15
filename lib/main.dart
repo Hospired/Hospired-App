@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import 'backend-api/dtos.dart';
 import 'backend-api/init_supabase.dart';
 import 'notifications_service.dart';
+import 'pages/appointments/appointment_page.dart';
 import 'pages/appointments/request_appointment.dart';
 import 'pages/home/home_page.dart';
 import 'pages/login_page.dart';
@@ -38,6 +40,10 @@ class MyApp extends StatelessWidget {
         '/setup-user': (context) => const SetupUserPage(),
         '/home': (context) => const HomePage(),
         '/home/request-appointment': (context) => const RequestAppointment(),
+        '/home/appointment': (context) => AppointmentPage(
+          appointment:
+              ModalRoute.of(context)!.settings.arguments as AppointmentRes,
+        ),
       },
       debugShowCheckedModeBanner: false,
 

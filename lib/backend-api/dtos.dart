@@ -442,6 +442,169 @@ class CreatePatientReq {
   ]);
 }
 
+class FacilityUnitRes {
+  FacilityUnitRes({
+    required this.id,
+    required this.facilityId,
+    required this.name,
+    this.indications,
+  });
+
+  int id;
+  int facilityId;
+  String name;
+  String? indications;
+
+  factory FacilityUnitRes.fromJson(Map<String, dynamic> json) =>
+      FacilityUnitRes(
+        id: json["id"],
+        facilityId: json["facility_id"],
+        name: json["name"],
+        indications: json["indications"],
+      );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "facility_id": facilityId,
+    "name": name,
+    "indications": indications,
+  };
+
+  FacilityUnitRes copyWith({
+    int? id,
+    int? facilityId,
+    String? name,
+    String? indications,
+  }) {
+    return FacilityUnitRes(
+      id: id ?? this.id,
+      facilityId: facilityId ?? this.facilityId,
+      name: name ?? this.name,
+      indications: indications ?? this.indications,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FacilityUnitRes &&
+          id == other.id &&
+          facilityId == other.facilityId &&
+          name == other.name &&
+          indications == other.indications;
+
+  @override
+  int get hashCode => Object.hashAll([id, facilityId, name, indications]);
+}
+
+class HealthcareFacilityRes {
+  HealthcareFacilityRes({
+    required this.id,
+    required this.name,
+    required this.servesInss,
+    required this.isPublicMinsa,
+    required this.address,
+    required this.district,
+    required this.municipalityId,
+    required this.latitude,
+    required this.longitude,
+    this.notes,
+  });
+
+  int id;
+  String name;
+  bool servesInss;
+  bool isPublicMinsa;
+  String address;
+  String district;
+  int municipalityId;
+  double latitude;
+  double longitude;
+  String? notes;
+
+  factory HealthcareFacilityRes.fromJson(Map<String, dynamic> json) =>
+      HealthcareFacilityRes(
+        id: json["id"],
+        name: json["name"],
+        servesInss: json["serves_inss"],
+        isPublicMinsa: json["is_public_minsa"],
+        address: json["address"],
+        district: json["district"],
+        municipalityId: json["municipality_id"],
+        latitude: json["latitude"],
+        longitude: json["longitude"],
+        notes: json["notes"],
+      );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "name": name,
+    "serves_inss": servesInss,
+    "is_public_minsa": isPublicMinsa,
+    "address": address,
+    "district": district,
+    "municipality_id": municipalityId,
+    "latitude": latitude,
+    "longitude": longitude,
+    "notes": notes,
+  };
+
+  HealthcareFacilityRes copyWith({
+    int? id,
+    String? name,
+    bool? servesInss,
+    bool? isPublicMinsa,
+    String? address,
+    String? district,
+    int? municipalityId,
+    double? latitude,
+    double? longitude,
+    String? notes,
+  }) {
+    return HealthcareFacilityRes(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      servesInss: servesInss ?? this.servesInss,
+      isPublicMinsa: isPublicMinsa ?? this.isPublicMinsa,
+      address: address ?? this.address,
+      district: district ?? this.district,
+      municipalityId: municipalityId ?? this.municipalityId,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      notes: notes ?? this.notes,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is HealthcareFacilityRes &&
+          other.id == id &&
+          other.name == name &&
+          other.servesInss == servesInss &&
+          other.isPublicMinsa == isPublicMinsa &&
+          other.address == address &&
+          other.district == district &&
+          other.municipalityId == municipalityId &&
+          other.latitude == latitude &&
+          other.longitude == longitude &&
+          other.notes == notes;
+
+  @override
+  int get hashCode => Object.hashAll([
+    id.hashCode,
+    name.hashCode,
+    servesInss.hashCode,
+    isPublicMinsa.hashCode,
+    address.hashCode,
+    district.hashCode,
+    municipalityId.hashCode,
+    latitude.hashCode,
+    longitude.hashCode,
+    notes.hashCode,
+  ]);
+}
+
 class MunicipalityRes {
   MunicipalityRes({
     required this.id,
