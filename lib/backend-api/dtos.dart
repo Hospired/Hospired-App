@@ -522,19 +522,20 @@ class HealthcareFacilityRes {
   double longitude;
   String? notes;
 
-  factory HealthcareFacilityRes.fromJson(Map<String, dynamic> json) =>
-      HealthcareFacilityRes(
-        id: json["id"],
-        name: json["name"],
-        servesInss: json["serves_inss"],
-        isPublicMinsa: json["is_public_minsa"],
-        address: json["address"],
-        district: json["district"],
-        municipalityId: json["municipality_id"],
-        latitude: json["latitude"],
-        longitude: json["longitude"],
-        notes: json["notes"],
-      );
+ factory HealthcareFacilityRes.fromJson(Map<String, dynamic> json) =>
+    HealthcareFacilityRes(
+      id: json["id"],
+      name: json["name"],
+      servesInss: json["serves_inss"],
+      isPublicMinsa: json["is_public_minsa"],
+      address: json["address"],
+      district: json["district"],
+      municipalityId: json["municipality_id"],
+      latitude: (json["latitude"] as num).toDouble(),
+      longitude: (json["longitude"] as num).toDouble(), 
+      notes: json["notes"],
+    );
+
 
   Map<String, dynamic> toJson() => {
     "id": id,

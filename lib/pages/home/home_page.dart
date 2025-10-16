@@ -12,6 +12,7 @@ import '../appointments/appointments_page.dart';
 import '../dashboard/dashboard_page.dart';
 import '../treatments/treatment_page.dart';
 import '../profile/profile_page.dart';
+import '../map/map_page.dart';
 import 'bottom_nav_bar.dart';
 import 'side_nav_bar.dart';
 
@@ -130,19 +131,21 @@ class HomePage extends HookConsumerWidget {
                             : (selectedNavIndex.value == 2
                                   ? TreatmentPage()
                                   : (selectedNavIndex.value == 3
-                                        ? ProfilePage()
-                                        : Column(
-                                            children: [
-                                              Text(
-                                                appUser?.toString() ??
-                                                    "No app user",
-                                              ),
-                                              Text(
-                                                authUser?.toString() ??
-                                                    "No auth user",
-                                              ),
-                                            ],
-                                          )))),
+                                        ? MapPage() // ✅ Nuevo
+                                        : (selectedNavIndex.value == 4
+                                              ? ProfilePage() // ✅ Mover perfil a 4
+                                              : Column(
+                                                  children: [
+                                                    Text(
+                                                      appUser?.toString() ??
+                                                          "No app user",
+                                                    ),
+                                                    Text(
+                                                      authUser?.toString() ??
+                                                          "No auth user",
+                                                    ),
+                                                  ],
+                                                ))))),
                 ),
               ],
             ),
@@ -155,18 +158,21 @@ class HomePage extends HookConsumerWidget {
                       : (selectedNavIndex.value == 2
                             ? TreatmentPage()
                             : (selectedNavIndex.value == 3
-                                  ? ProfilePage()
-                                  : Column(
-                                      children: [
-                                        Text(
-                                          appUser?.toString() ?? "No app user",
-                                        ),
-                                        Text(
-                                          authUser?.toString() ??
-                                              "No auth user",
-                                        ),
-                                      ],
-                                    )))),
+                                  ? MapPage() // ✅ Nuevo
+                                  : (selectedNavIndex.value == 4
+                                        ? ProfilePage() // ✅ Mover perfil
+                                        : Column(
+                                            children: [
+                                              Text(
+                                                appUser?.toString() ??
+                                                    "No app user",
+                                              ),
+                                              Text(
+                                                authUser?.toString() ??
+                                                    "No auth user",
+                                              ),
+                                            ],
+                                          ))))),
             bottomNavigationBar: BottomNavBar(
               selectedIndex: selectedNavIndex.value,
               onTap: (index) => onSelectNavigationIndex(index),
