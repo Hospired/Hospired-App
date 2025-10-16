@@ -174,4 +174,14 @@ class ApiService {
       throw Exception('An unexpected error occurred: $e');
     }
   }
+
+  static Future<void> signOutUser() async {
+    try {
+      await _supabase.auth.signOut();
+    } on AuthException catch (e) {
+      throw Exception(e.message);
+    } catch (e) {
+      throw Exception('An unexpected error occurred: $e');
+    }
+  }
 }
