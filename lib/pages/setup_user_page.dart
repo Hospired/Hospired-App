@@ -96,7 +96,9 @@ class SetupUserPage extends HookConsumerWidget {
               appUserId: createdUser.id,
               nationalId: nationalIdController.text,
               municipalityId: selectedMunicipality.value!.id,
-              inssId: int.parse(inssIdController.text),
+              inssId: inssIdController.text.isNotEmpty
+                  ? int.tryParse(inssIdController.text)
+                  : null,
               phoneNumber: phoneNumberController.text,
               occupation: occupationController.text,
               neighborHood: districtController.text,

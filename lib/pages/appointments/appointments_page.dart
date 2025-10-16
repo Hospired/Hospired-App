@@ -112,8 +112,8 @@ class AppointmentsPage extends HookConsumerWidget {
                   if (upcomingAppointments.isEmpty) {
                     return Container(
                       height: 96,
-                      width: 144,
-                      margin: const EdgeInsets.all(16),
+                      width: 160,
+                      margin: const EdgeInsets.all(0),
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         border: Border.all(
@@ -123,7 +123,10 @@ class AppointmentsPage extends HookConsumerWidget {
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: const Center(
-                        child: Text('No hay citas programadas.'),
+                        child: Text(
+                          'No hay citas programadas.',
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                     );
                   }
@@ -155,8 +158,8 @@ class AppointmentsPage extends HookConsumerWidget {
                   if (pastAppointments.isEmpty) {
                     return Container(
                       height: 96,
-                      width: 144,
-                      margin: const EdgeInsets.all(16),
+                      width: 160,
+                      margin: const EdgeInsets.all(0),
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         border: Border.all(
@@ -165,7 +168,12 @@ class AppointmentsPage extends HookConsumerWidget {
                         ),
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      child: const Center(child: Text('No hay citas pasadas.')),
+                      child: const Center(
+                        child: Text(
+                          'No hay citas pasadas.',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
                     );
                   }
                   return AppointmentCard(
