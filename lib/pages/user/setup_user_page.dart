@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../backend-api/api_service.dart';
-import '../backend-api/dtos.dart';
-import '../colors.dart';
-import '../providers/app_user.dart';
-import '../providers/auth_user.dart';
-import '../providers/municipalities.dart';
-import '../providers/patient.dart';
-import '../text_styles.dart';
-import '../ui/alert_dialogs.dart';
+import '../../backend-api/api_service.dart';
+import '../../backend-api/dtos.dart';
+import '../../colors.dart';
+import '../../providers/app_user.dart';
+import '../../providers/auth_user.dart';
+import '../../providers/municipalities.dart';
+import '../../providers/patient.dart';
+import '../../text_styles.dart';
+import '../../ui/alert_dialogs.dart';
 
 class SetupUserPage extends HookConsumerWidget {
   const SetupUserPage({super.key});

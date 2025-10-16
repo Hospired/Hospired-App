@@ -3,10 +3,10 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../backend-api/api_service.dart';
-import '../backend-api/dtos.dart';
-import '../colors.dart';
-import '../providers/auth_user.dart';
+import '../../backend-api/api_service.dart';
+import '../../backend-api/dtos.dart';
+import '../../colors.dart';
+import '../../providers/auth_user.dart';
 
 class LoginPage extends HookConsumerWidget {
   const LoginPage({super.key});
