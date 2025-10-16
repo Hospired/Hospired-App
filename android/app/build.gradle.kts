@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.servisalud"
+    namespace = "com.hospired.app"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.servisalud"
+        applicationId = "com.hospired.app"
         minSdk = flutter.minSdkVersion
         targetSdk = 36
         versionCode = flutter.versionCode
@@ -19,7 +19,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
-        isCoreLibraryDesugaringEnabled = true  
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {

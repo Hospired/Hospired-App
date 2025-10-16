@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:servisalud/text_styles.dart';
 
 import '../../backend-api/dtos.dart';
+import '../../text_styles.dart';
 import 'appointment_tag.dart';
 
 class AppointmentCard extends StatelessWidget {
