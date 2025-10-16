@@ -187,7 +187,11 @@ class ApiService {
 
   static Future<void> signUpUser(String email, String password) async {
     try {
-      await _supabase.auth.signUp(email: email, password: password);
+      await _supabase.auth.signUp(
+        email: email,
+        password: password,
+        emailRedirectTo: 'https://hospired.github.io/hospired/',
+      );
     } on AuthException catch (e) {
       throw Exception(e.message);
     } catch (e) {

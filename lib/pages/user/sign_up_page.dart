@@ -60,6 +60,14 @@ class SignUpPage extends HookConsumerWidget {
                 style: HospiredTextStyle.sectionTitle,
               ),
               const SizedBox(height: 24),
+              /*
+              Text(
+                "Si tienes cuenta en Hospired como médico o administrador, no te registres de nuevo. Ingresa con las mismas credenciales. La app creará un registro de paciente para el mismo usuario.",
+                textAlign: TextAlign.center,
+                style: HospiredTextStyle.body2,
+              ),
+              const SizedBox(height: 16),
+              */
               if (!signUpSuccessful.value) ...[
                 TextField(
                   controller: emailController,
@@ -101,11 +109,14 @@ class SignUpPage extends HookConsumerWidget {
                 ),
               ] else ...[
                 Text(
-                  "Cuenta creada con éxito!\nRevisa tu correo electrónico ${emailController.text} para activar tu cuenta.",
+                  "Cuenta creada con éxito!\n\nRevisa tu correo electrónico ${emailController.text} y dale clic en el link para activar tu cuenta.\n\nDespués vuelve a la app e inicia sesión con tus credenciales.",
                   textAlign: TextAlign.center,
-                  style: HospiredTextStyle.body3Bold.copyWith(
-                    color: HospiredColors.primary,
-                  ),
+                  style: HospiredTextStyle.body2,
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text("Ir a inicio"),
                 ),
               ],
             ],
