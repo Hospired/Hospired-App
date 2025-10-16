@@ -46,3 +46,6 @@ app.*.map.json
 
 # Supabase related
 /lib/supabase_configuration.dart
+
+# openai
+/lib/openai_configuration.dart
