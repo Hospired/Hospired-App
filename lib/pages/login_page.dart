@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -42,6 +43,10 @@ class LoginPage extends HookConsumerWidget {
       }
     }, []);
 
+    final onRequestAccountTap = useCallback((BuildContext context) {
+      Navigator.of(context).pushNamed('/login/sign-up');
+    }, []);
+
     return Scaffold(
       appBar: AppBar(title: const Text('H O S P I R E D')),
       body: Center(
@@ -53,6 +58,28 @@ class LoginPage extends HookConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(32, 8, 32, 24),
+                child: Center(
+                  child: RichText(
+                    text: TextSpan(
+                      style: TextStyle(color: Colors.black, fontSize: 16),
+                      children: [
+                        TextSpan(text: "No tienes cuenta? "),
+                        TextSpan(
+                          text: "Solicita tu cuenta",
+                          style: TextStyle(
+                            color: HospiredColors.confirmedForegroundColor,
+                            decoration: TextDecoration.underline,
+                          ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () => onRequestAccountTap(context),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
               TextField(
                 controller: emailController,
                 onChanged: (value) => error.value = "",

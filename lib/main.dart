@@ -11,6 +11,7 @@ import 'pages/home/home_page.dart';
 import 'pages/login_page.dart';
 import 'pages/setup_user_page.dart';
 import 'pages/start_page.dart';
+import 'pages/user/sign_up_page.dart';
 import 'providers/init_hive.dart';
 import 'theme.dart';
 
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/start': (context) => const StartPage(),
         '/login': (context) => const LoginPage(),
+        '/login/sign-up': (context) => const SignUpPage(),
         '/setup-user': (context) => const SetupUserPage(),
         '/home': (context) => const HomePage(),
         '/home/request-appointment': (context) => const RequestAppointment(),

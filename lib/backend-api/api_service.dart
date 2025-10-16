@@ -184,4 +184,14 @@ class ApiService {
       throw Exception('An unexpected error occurred: $e');
     }
   }
+
+  static Future<void> signUpUser(String email, String password) async {
+    try {
+      await _supabase.auth.signUp(email: email, password: password);
+    } on AuthException catch (e) {
+      throw Exception(e.message);
+    } catch (e) {
+      throw Exception('An unexpected error occurred: $e');
+    }
+  }
 }
