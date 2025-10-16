@@ -65,9 +65,9 @@ class LoginPage extends HookConsumerWidget {
                     text: TextSpan(
                       style: TextStyle(color: Colors.black, fontSize: 16),
                       children: [
-                        TextSpan(text: "No tienes cuenta? "),
+                        TextSpan(text: "¿No tienes cuenta? "),
                         TextSpan(
-                          text: "Solicita tu cuenta",
+                          text: "Regístrate",
                           style: TextStyle(
                             color: HospiredColors.confirmedForegroundColor,
                             decoration: TextDecoration.underline,
