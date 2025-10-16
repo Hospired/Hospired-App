@@ -1,23 +1,21 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:http/http.dart' as http;
 
 import '../../backend-api/api_service.dart';
 import '../../backend-api/dtos.dart';
+import '../../backend-api/enum_maps.dart';
 import '../../breakpoints.dart';
 import '../../colors.dart';
-import '../../openai_configuration.dart';
 import '../../providers/patient.dart';
 import '../../text_styles.dart';
+import '../../utilities/openai.dart';
 
 const String prePrompt = '''
 Eres una IA que le ayuda a pacientes agendar citas médicas en hospitales mediante un sistema digital llamado hospired.
 Los pacientes escribirán el motivo de su cita. Tú le responderás que tipo de especialista le corresponde al paciente
 según la descripción que haya dado. Si la descripción es muy inexacta, puedes solicitarle al paciente que describa su
-problema mas detalladamente. Solo les puede preguntar 1 vez. Si no puedes determinar la especialidad después de la segunda
+problema mas detalladamente. Solo le puedes preguntar 1 vez. Si no puedes determinar la especialidad después de la segunda
 respuesta, contesta que no es posible determinar la especialidad, y recomienda ver un médico general.
 
 La lista de las especialidades, según la base de datos, es la siguiente:
@@ -40,41 +38,21 @@ La lista de las especialidades, según la base de datos, es la siguiente:
   'Ophthalmology',
   'Otolaryngology'
 
-En la respuesta, traduce la especialidad al español.
+En la respuesta, traduce la especialidad al español. No ingreses caracteres de formatear texto, como
+por ejemplo **, <H1>, etc., solo plain text.
+
+Para la primera respuesta, existe la siguiente regla:
+Formula siempre una frase respondiendole al usuario. Si requieres mas información, termina tu respuesta
+con exactamente el siguiente string: ##More_Information_Required.
+Si sabes que especialidad proponer, termina tu respuesta con ##<specialty> reemplazando a <specialty>
+con un una especialidad de la lista, con su nombre original, por ejemplo ##Neurology.
+
+Para la segunda respuesta, existe la siguiente regla:
+Formula siempre una frase respondiendole al usuario. Si sabes que especialidad proponer, termina tu
+respuesta con ##<specialty> reemplazando a <specialty> con un una especialidad de la lista, con su
+nombre original, por ejemplo ##Neurology.
+Si no sabes qué especialidad proponer, termina la respuesta con ##General Practice
 ''';
-
-Future<String?> callOpenAI(List<Map<String, String>> messages) async {
-  final apiKey = openAiApiKeyDev;
-  final url = Uri.parse('https://api.openai.com/v1/chat/completions');
-
-  final headers = {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer $apiKey',
-  };
-
-  /*
-  [
-    {'role': 'user', 'content': 'Hello!'},
-  ]
-  */
-
-  final body = jsonEncode({
-    'model': 'gpt-3.5-turbo',
-    'messages': messages,
-    'temperature': 0.7,
-  });
-
-  final response = await http.post(url, headers: headers, body: body);
-
-  if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
-    print(data['choices'][0]['message']['content']);
-    return data['choices'][0]['message']['content'];
-  } else {
-    print('Error: ${response.statusCode}');
-    print(response.body);
-  }
-}
 
 class RequestAppointment extends HookConsumerWidget {
   const RequestAppointment({super.key});
@@ -88,18 +66,47 @@ class RequestAppointment extends HookConsumerWidget {
       {'role': 'system', 'content': prePrompt},
     ]);
     final error = useState<String>("");
+    final inputMoreInformation = useState<bool>(false);
+    final selectedSpecialty = useState<String>("");
+    final readyToSubmit = useState<bool>(false);
 
     final TextEditingController motiveController = useTextEditingController();
+    final TextEditingController moreInfoController = useTextEditingController();
 
     final callOpenAi = useCallback(() async {
       List<Map<String, String>> currentMessages = [...messages.value];
-      currentMessages.add({'role': 'user', 'content': motiveController.text});
-      String? assistantResponse = await callOpenAI(currentMessages);
+
+      if (inputMoreInformation.value) {
+        currentMessages.add({
+          'role': 'user',
+          'content': moreInfoController.text,
+        });
+      } else {
+        currentMessages.add({'role': 'user', 'content': motiveController.text});
+      }
+
+      String? assistantResponse = await requestOpenAiResponse(currentMessages);
       if (assistantResponse != null) {
+        List<String> splittedResponse = assistantResponse.split('##');
+        if (splittedResponse.length == 2) {
+          if (splittedResponse[1].contains('More_Information_Required')) {
+            inputMoreInformation.value = true;
+          } else {
+            if (medicalSpecialties.keys.contains(splittedResponse[1])) {
+              selectedSpecialty.value = splittedResponse[1];
+              readyToSubmit.value = true;
+            }
+          }
+        }
+
         currentMessages.add({
           'role': 'assistant',
-          'content': assistantResponse,
+          'content': splittedResponse[0],
         });
+        if (currentMessages.length > 4) {
+          readyToSubmit.value = true;
+        }
+
         messages.value = [...currentMessages];
       }
     }, []);
@@ -112,7 +119,7 @@ class RequestAppointment extends HookConsumerWidget {
             CreateAppointmentReq(
               patientId: patient.id,
               motive: motiveController.text,
-              specialty: "General Practice",
+              specialty: selectedSpecialty.value,
             ),
           );
           Navigator.of(context).pop();
@@ -139,7 +146,7 @@ class RequestAppointment extends HookConsumerWidget {
           child: Column(
             crossAxisAlignment: !disclaimerShown.value
                 ? CrossAxisAlignment.center
-                : CrossAxisAlignment.start,
+                : CrossAxisAlignment.stretch,
             children: [
               if (!disclaimerShown.value) ...[
                 const Spacer(),
@@ -168,8 +175,10 @@ class RequestAppointment extends HookConsumerWidget {
                 const SizedBox(height: 8),
                 TextField(
                   controller: motiveController,
-                  readOnly: requestingAppointment.value,
-                  //onChanged: (value) => error.value = "",
+                  readOnly:
+                      requestingAppointment.value ||
+                      inputMoreInformation.value ||
+                      readyToSubmit.value,
                   minLines: 3,
                   maxLines: 3,
                   textAlignVertical: TextAlignVertical.top,
@@ -179,30 +188,87 @@ class RequestAppointment extends HookConsumerWidget {
                     border: OutlineInputBorder(),
                   ),
                 ),
-                const SizedBox(height: 8),
-                SizedBox(
-                  height: 192,
-                  child: Text(
-                    messages.value.isNotEmpty && messages.value.length > 2
-                        ? messages.value.last['content'] ?? ''
-                        : '',
+                if (messages.value.length > 2) ...[
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    height: 96,
+                    child: Text(messages.value[2]['content'] ?? ''),
                   ),
-                ),
-                ElevatedButton(
-                  onPressed: () => callOpenAi(),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                    child: Text('Call OpenAi', style: HospiredTextStyle.body3),
+                ],
+                if (inputMoreInformation.value) ...[
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: moreInfoController,
+                    readOnly:
+                        requestingAppointment.value ||
+                        messages.value.length > 5 ||
+                        readyToSubmit.value,
+                    minLines: 3,
+                    maxLines: 3,
+                    textAlignVertical: TextAlignVertical.top,
+                    decoration: const InputDecoration(
+                      hintText: "",
+                      labelText: "Describe tu problema mas detalladamente",
+                      border: OutlineInputBorder(),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                ElevatedButton(
-                  onPressed: () => callCreateAppointment(context),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                    child: Text('Solicitar', style: HospiredTextStyle.body3),
+                  if (messages.value.length > 4) ...[
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      height: 96,
+                      child: Text(messages.value[4]['content'] ?? ''),
+                    ),
+                  ],
+                ],
+                if (!readyToSubmit.value) ...[
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => callOpenAi(),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                      child: Text(
+                        'Consultar IA Hospired',
+                        style: HospiredTextStyle.body3,
+                      ),
+                    ),
                   ),
-                ),
+                ],
+
+                if (readyToSubmit.value) ...[
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    decoration: const InputDecoration(
+                      labelText: "Especialidad",
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 16,
+                      ),
+                    ),
+                    initialValue: selectedSpecialty.value.isNotEmpty
+                        ? selectedSpecialty.value
+                        : 'General Practice',
+                    onChanged: (String? specialty) {
+                      if (specialty != null) {
+                        selectedSpecialty.value = specialty;
+                      }
+                    },
+                    items: medicalSpecialties.entries.map((entry) {
+                      return DropdownMenuItem<String>(
+                        value: entry.key,
+                        child: Text(entry.value),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => callCreateAppointment(context),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                      child: Text('Solicitar', style: HospiredTextStyle.body3),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 8),
                 Padding(
                   padding: const EdgeInsets.all(16),
