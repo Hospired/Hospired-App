@@ -56,21 +56,21 @@ class AppTheme {
     ),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       selectedItemColor: HospiredColors.primaryLight,
-      unselectedItemColor: HospiredColors.gray,
-      backgroundColor: HospiredColors.white,
+      unselectedItemColor: HospiredColors.white,
+      backgroundColor: HospiredColors.primary,
     ),
     navigationRailTheme: NavigationRailThemeData(
       elevation: 2,
-      backgroundColor: HospiredColors.white,
+      backgroundColor: HospiredColors.primary,
       selectedIconTheme: const IconThemeData(
         color: HospiredColors.primaryLight,
       ),
-      unselectedIconTheme: const IconThemeData(color: HospiredColors.gray),
+      unselectedIconTheme: const IconThemeData(color: HospiredColors.white),
       selectedLabelTextStyle: HospiredTextStyle.body2.copyWith(
         color: HospiredColors.primaryLight,
       ),
       unselectedLabelTextStyle: HospiredTextStyle.body1.copyWith(
-        color: HospiredColors.gray,
+        color: HospiredColors.white,
       ),
       useIndicator: true,
       indicatorColor: HospiredColors.white,

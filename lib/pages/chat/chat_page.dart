@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../colors.dart';
 import '../../utilities/openai.dart';
 
 class ChatPage extends StatefulWidget {
@@ -37,7 +39,9 @@ class _ChatPageState extends State<ChatPage> {
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isUser
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         children: [
           if (!isUser)
             const CircleAvatar(
@@ -49,23 +53,18 @@ class _ChatPageState extends State<ChatPage> {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isUser ? Colors.blue[300] : Colors.grey[200],
+                color: isUser ? HospiredColors.primaryLight : Colors.grey[200],
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Text(
                 message["content"] ?? "",
-                style: TextStyle(
-                  color: isUser ? Colors.white : Colors.black87,
-                ),
+                style: TextStyle(color: isUser ? Colors.white : Colors.black87),
               ),
             ),
           ),
           if (isUser) const SizedBox(width: 8),
           if (isUser)
-            const CircleAvatar(
-              radius: 14,
-              child: Icon(Icons.person, size: 16),
-            ),
+            const CircleAvatar(radius: 14, child: Icon(Icons.person, size: 16)),
         ],
       ),
     );
@@ -75,10 +74,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        backgroundColor: Colors.blue[400],
-        title: const Text("Chat Hospired"),
-      ),
+      appBar: AppBar(title: const Text("Chat Hospired")),
       body: Column(
         children: [
           Expanded(
@@ -113,7 +109,7 @@ class _ChatPageState extends State<ChatPage> {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.send, color: Colors.blue),
+                  icon: const Icon(Icons.send, color: HospiredColors.primary),
                   onPressed: _isLoading ? null : _sendMessage,
                 ),
               ],

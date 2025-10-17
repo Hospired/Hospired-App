@@ -23,10 +23,7 @@ class DashboardPage extends StatelessWidget {
           width: double.infinity,
           color: const Color(0xFF29235c),
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [Image.asset("assets/logotipo.png", height: 80)],
-          ),
+          child: Center(child: Image.asset("assets/logotipo.png", height: 80)),
         ),
 
         // Sección 2 - Bienvenida
