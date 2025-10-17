@@ -11,14 +11,19 @@ class StartPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final checkSessionState = useCallback(() async {
+      await Future.delayed(const Duration(milliseconds: 1500));
+      final authUserRes = ref.read(authUserProvider.notifier).checkSession();
+      if (authUserRes != null) {
+        Navigator.pushNamedAndRemoveUntil(context, '/home', (_) => false);
+      } else {
+        Navigator.pushNamedAndRemoveUntil(context, '/login', (_) => false);
+      }
+    }, []);
+
     useEffect(() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        final authUserRes = ref.read(authUserProvider.notifier).checkSession();
-        if (authUserRes != null) {
-          Navigator.pushNamedAndRemoveUntil(context, '/home', (_) => false);
-        } else {
-          Navigator.pushNamedAndRemoveUntil(context, '/login', (_) => false);
-        }
+        checkSessionState();
       });
       return;
     }, []);
@@ -30,18 +35,8 @@ class StartPage extends HookConsumerWidget {
     }, []);
 
     return Scaffold(
-      body: Column(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(32),
-            child: Text(
-              "Verificando sesión ...",
-              style: HospiredTextStyle.title3,
-            ),
-          ),
-        ],
-      ),
+      backgroundColor: const Color(0xFF29235c),
+      body: Center(child: Image.asset("assets/logotipo.png", height: 120)),
     );
   }
 }

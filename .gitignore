@@ -51,4 +51,4 @@ app.*.map.json
 /lib/openai_configuration.dart
 
 # apiKey
-
+googlekey
