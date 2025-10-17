@@ -30,7 +30,12 @@ class MapPage extends HookConsumerWidget {
               facility.latitude.toDouble(),
               facility.longitude.toDouble(),
             ),
-            infoWindow: InfoWindow(title: facility.name),
+            infoWindow: InfoWindow(
+              title: facility.name,
+              snippet: (facility.isPublicMinsa
+                  ? "Público"
+                  : (facility.servesInss ? "Privado / INSS" : "Privado")),
+            ),
           ),
         );
       }
