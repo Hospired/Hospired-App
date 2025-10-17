@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../colors.dart';
 import '../text_styles.dart';
 import '../providers/auth_user.dart';
 import '../providers/municipalities.dart';
@@ -35,7 +36,7 @@ class StartPage extends HookConsumerWidget {
     }, []);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF29235c),
+      backgroundColor: HospiredColors.confirmedForegroundColor,
       body: Center(child: Image.asset("assets/logotipo.png", height: 120)),
     );
   }

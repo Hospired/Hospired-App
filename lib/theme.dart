@@ -4,7 +4,7 @@ import 'colors.dart';
 import 'text_styles.dart';
 
 class AppTheme {
-  static const Color primaryColor = Color.fromRGBO(35, 169, 214, 1);
+  //static const Color primaryColor = Color.fromRGBO(35, 169, 214, 1);
 
   static final ThemeData theme = ThemeData(
     scaffoldBackgroundColor: Colors.grey[100],
@@ -55,7 +55,7 @@ class AppTheme {
       labelTextStyle: WidgetStateProperty.all(HospiredTextStyle.labelButton),
     ),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      selectedItemColor: primaryColor,
+      selectedItemColor: HospiredColors.primaryLight,
       unselectedItemColor: HospiredColors.gray,
       backgroundColor: HospiredColors.white,
     ),
