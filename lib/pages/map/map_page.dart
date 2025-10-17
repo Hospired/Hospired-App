@@ -4,7 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-import '../../providers/healthcare_facilities_provider.dart';
+import '../../providers/healthcare_facilities.dart';
 
 class MapPage extends HookConsumerWidget {
   const MapPage({super.key});
