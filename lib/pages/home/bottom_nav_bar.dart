@@ -30,9 +30,22 @@ class BottomNavBar extends StatelessWidget {
           icon: Icon(Icons.medical_services),
           label: 'Tratamiento',
         ),
-        BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Mapa'),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.map),
+          label: 'Mapa',
+        ),
+
+        BottomNavigationBarItem(
+          icon: Icon(Icons.chat),
+          label: 'Chat',
+        ),
+
+        BottomNavigationBarItem(
+          icon: Icon(Icons.person),
+          label: 'Perfil',
+        ),
       ],
     );
   }
 }
+
