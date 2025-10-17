@@ -27,11 +27,14 @@ class SideNavBar extends StatelessWidget {
           icon: Icon(Icons.calendar_today),
           label: Text('Citas'),
         ),
+        /*
+        // Enable again when treatments logic is implemented
         NavigationRailDestination(
           padding: EdgeInsets.symmetric(vertical: 8),
           icon: Icon(Icons.medical_services),
           label: Text('Tratamiento'),
         ),
+        */
         NavigationRailDestination(
           padding: EdgeInsets.symmetric(vertical: 8),
           icon: Icon(Icons.map),

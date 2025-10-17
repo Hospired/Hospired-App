@@ -10,10 +10,10 @@ class AppTheme {
     scaffoldBackgroundColor: Colors.grey[100],
     appBarTheme: const AppBarTheme(
       backgroundColor: HospiredColors.primary,
-      surfaceTintColor: HospiredColors.gray,
+      surfaceTintColor: null,
       iconTheme: IconThemeData(color: HospiredColors.white),
       centerTitle: true,
-      elevation: 4,
+      elevation: 0,
       titleTextStyle: TextStyle(
         color: Colors.white,
         fontSize: 20,
@@ -62,9 +62,7 @@ class AppTheme {
     navigationRailTheme: NavigationRailThemeData(
       elevation: 2,
       backgroundColor: HospiredColors.primary,
-      selectedIconTheme: const IconThemeData(
-        color: HospiredColors.primaryLight,
-      ),
+      selectedIconTheme: const IconThemeData(color: HospiredColors.primary),
       unselectedIconTheme: const IconThemeData(color: HospiredColors.white),
       selectedLabelTextStyle: HospiredTextStyle.body2.copyWith(
         color: HospiredColors.primaryLight,
@@ -73,7 +71,7 @@ class AppTheme {
         color: HospiredColors.white,
       ),
       useIndicator: true,
-      indicatorColor: HospiredColors.white,
+      indicatorColor: HospiredColors.primaryLight,
       minWidth: 112,
     ),
     cardTheme: CardThemeData(

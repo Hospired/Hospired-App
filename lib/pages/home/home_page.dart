@@ -24,7 +24,6 @@ class HomePage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final loading = useState<bool>(true);
     final loadingError = useState<bool>(false);
-    final patient = ref.watch(patientProvider);
     final appUser = ref.watch(appUserProvider);
     final authUser = ref.watch(authUserProvider);
     final previousAuthUser = usePrevious(authUser);
@@ -130,25 +129,23 @@ class HomePage extends HookConsumerWidget {
                       : (selectedNavIndex.value == 1
                             ? AppointmentsPage()
                             : (selectedNavIndex.value == 2
-                                  ? TreatmentPage()
+                                  ? MapPage()
                                   : (selectedNavIndex.value == 3
-                                        ? MapPage()
-                                        : (selectedNavIndex.value == 4
-                                          ? ChatPage()
-                                          : selectedNavIndex.value == 5
-                                              ? ProfilePage() 
-                                              : Column(
-                                                  children: [
-                                                    Text(
-                                                      appUser?.toString() ??
-                                                          "No app user",
-                                                    ),
-                                                    Text(
-                                                      authUser?.toString() ??
-                                                          "No auth user",
-                                                    ),
-                                                  ],
-                                                ))))),
+                                        ? ChatPage()
+                                        : selectedNavIndex.value == 4
+                                        ? ProfilePage()
+                                        : Column(
+                                            children: [
+                                              Text(
+                                                appUser?.toString() ??
+                                                    "No app user",
+                                              ),
+                                              Text(
+                                                authUser?.toString() ??
+                                                    "No auth user",
+                                              ),
+                                            ],
+                                          )))),
                 ),
               ],
             ),
@@ -157,27 +154,24 @@ class HomePage extends HookConsumerWidget {
             body: selectedNavIndex.value == 0
                 ? DashboardPage(onSelectNavIndex: onSelectNavigationIndex)
                 : (selectedNavIndex.value == 1
-                            ? AppointmentsPage()
-                            : (selectedNavIndex.value == 2
-                                  ? TreatmentPage()
-                                  : (selectedNavIndex.value == 3
-                                        ? MapPage()
-                                        : (selectedNavIndex.value == 4
-                                          ? ChatPage()
-                                          : selectedNavIndex.value == 5
-                                              ? ProfilePage() 
-                                              : Column(
-                                                  children: [
-                                                    Text(
-                                                      appUser?.toString() ??
-                                                          "No app user",
-                                                    ),
-                                                    Text(
-                                                      authUser?.toString() ??
-                                                          "No auth user",
-                                                    ),
-                                                  ],
-                                                ))))),
+                      ? AppointmentsPage()
+                      : (selectedNavIndex.value == 2
+                            ? MapPage()
+                            : (selectedNavIndex.value == 3
+                                  ? ChatPage()
+                                  : selectedNavIndex.value == 4
+                                  ? ProfilePage()
+                                  : Column(
+                                      children: [
+                                        Text(
+                                          appUser?.toString() ?? "No app user",
+                                        ),
+                                        Text(
+                                          authUser?.toString() ??
+                                              "No auth user",
+                                        ),
+                                      ],
+                                    )))),
             bottomNavigationBar: BottomNavBar(
               selectedIndex: selectedNavIndex.value,
               onTap: (index) => onSelectNavigationIndex(index),
@@ -185,61 +179,3 @@ class HomePage extends HookConsumerWidget {
           );
   }
 }
-
-/*
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0;
-
-  final List<Widget> _pages = const [
-    ProfilePage(),
-    AppointmentPage(),
-    TreatmentPage(),
-    PathologiesPage(),
-    ChatBotPage(),
-    MapPage(),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        showUnselectedLabels: true,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today),
-            label: 'Citas',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.medical_services),
-            label: 'Tratamiento',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.assignment),
-            label: 'Patologías',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
-          BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Mapa'),
-        ],
-      ),
-    );
-  }
-}
-*/

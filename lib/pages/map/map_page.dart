@@ -40,6 +40,7 @@ class MapPage extends HookConsumerWidget {
         );
       }
       markers.value = currentMarkers;
+      return;
     }, [healthcareFacilities]);
 
     return Scaffold(
