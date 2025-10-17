@@ -7,6 +7,7 @@ import '../../backend-api/dtos.dart';
 import '../../backend-api/enum_maps.dart';
 import '../../breakpoints.dart';
 import '../../colors.dart';
+import '../../providers/appointments.dart';
 import '../../providers/patient.dart';
 import '../../text_styles.dart';
 import '../../utilities/openai.dart';
@@ -67,8 +68,9 @@ class RequestAppointment extends HookConsumerWidget {
     ]);
     final error = useState<String>("");
     final inputMoreInformation = useState<bool>(false);
-    final selectedSpecialty = useState<String>("");
+    final selectedSpecialty = useState<String>("General Practice");
     final readyToSubmit = useState<bool>(false);
+    final appointmentRequested = useState<bool>(false);
 
     final TextEditingController motiveController = useTextEditingController();
     final TextEditingController moreInfoController = useTextEditingController();
@@ -122,7 +124,7 @@ class RequestAppointment extends HookConsumerWidget {
               specialty: selectedSpecialty.value,
             ),
           );
-          Navigator.of(context).pop();
+          appointmentRequested.value = true;
         } catch (err) {
           error.value = err.toString();
         } finally {
@@ -130,6 +132,20 @@ class RequestAppointment extends HookConsumerWidget {
         }
       }
     }, []);
+
+    final navigateBack = useCallback(() {
+      ref.read(appointmentsProvider.notifier).fetch();
+      Navigator.of(context).pop();
+    }, []);
+
+    useEffect(() {
+      if (motiveController.text.length > 5) {
+        readyToSubmit.value = true;
+      } else {
+        readyToSubmit.value = false;
+      }
+      return;
+    }, [motiveController.text]);
 
     return Scaffold(
       appBar: AppBar(
@@ -170,7 +186,7 @@ class RequestAppointment extends HookConsumerWidget {
                   ),
                 ),
                 const Spacer(),
-              ] else ...[
+              ] else if (!appointmentRequested.value) ...[
                 Text("Motivo", style: HospiredTextStyle.title3),
                 const SizedBox(height: 8),
                 TextField(
@@ -188,81 +204,38 @@ class RequestAppointment extends HookConsumerWidget {
                     border: OutlineInputBorder(),
                   ),
                 ),
-                if (messages.value.length > 2) ...[
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    height: 96,
-                    child: Text(messages.value[2]['content'] ?? ''),
-                  ),
-                ],
-                if (inputMoreInformation.value) ...[
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: moreInfoController,
-                    readOnly:
-                        requestingAppointment.value ||
-                        messages.value.length > 5 ||
-                        readyToSubmit.value,
-                    minLines: 3,
-                    maxLines: 3,
-                    textAlignVertical: TextAlignVertical.top,
-                    decoration: const InputDecoration(
-                      hintText: "",
-                      labelText: "Describe tu problema mas detalladamente",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  if (messages.value.length > 4) ...[
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      height: 96,
-                      child: Text(messages.value[4]['content'] ?? ''),
-                    ),
-                  ],
-                ],
-                if (!readyToSubmit.value) ...[
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => callOpenAi(),
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                      child: Text(
-                        'Consultar IA Hospired',
-                        style: HospiredTextStyle.body3,
-                      ),
-                    ),
-                  ),
-                ],
 
-                if (readyToSubmit.value) ...[
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<String>(
-                    decoration: const InputDecoration(
-                      labelText: "Especialidad",
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 16,
-                      ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  decoration: const InputDecoration(
+                    labelText: "Especialidad",
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 16,
                     ),
-                    initialValue: selectedSpecialty.value.isNotEmpty
-                        ? selectedSpecialty.value
-                        : 'General Practice',
-                    onChanged: (String? specialty) {
-                      if (specialty != null) {
-                        selectedSpecialty.value = specialty;
-                      }
-                    },
-                    items: medicalSpecialties.entries.map((entry) {
-                      return DropdownMenuItem<String>(
-                        value: entry.key,
-                        child: Text(entry.value),
-                      );
-                    }).toList(),
                   ),
-                  const SizedBox(height: 16),
+                  initialValue: selectedSpecialty.value.isNotEmpty
+                      ? selectedSpecialty.value
+                      : 'General Practice',
+                  onChanged: (String? specialty) {
+                    if (specialty != null) {
+                      selectedSpecialty.value = specialty;
+                    }
+                  },
+                  items: medicalSpecialties.entries.map((entry) {
+                    return DropdownMenuItem<String>(
+                      value: entry.key,
+                      child: Text(entry.value),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 16),
+                if (readyToSubmit.value) ...[
                   ElevatedButton(
-                    onPressed: () => callCreateAppointment(context),
+                    onPressed: readyToSubmit.value
+                        ? () => callCreateAppointment(context)
+                        : null,
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                       child: Text('Solicitar', style: HospiredTextStyle.body3),
@@ -276,6 +249,21 @@ class RequestAppointment extends HookConsumerWidget {
                     error.value,
                     textAlign: TextAlign.center,
                     style: const TextStyle(color: HospiredColors.danger),
+                  ),
+                ),
+              ] else ...[
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 48, 16, 16),
+                  child: Text(
+                    "¡Tu solicitud ha sido creada con éxito!",
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () => navigateBack(),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                    child: Text('Regresar', style: HospiredTextStyle.body3),
                   ),
                 ),
               ],

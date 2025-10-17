@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hospired/providers/destroy_session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../backend-api/api_service.dart';
@@ -40,8 +41,8 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _logout(BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLogged', false);
+    await ApiService.signOutUser();
+    // TODO: call destroySession();
     Navigator.pushReplacementNamed(context, '/login');
   }
 
@@ -65,87 +66,86 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildProfileView() {
-  if (userData == null) {
-    return const Center(child: Text("No se encontraron datos del usuario."));
-  }
+    if (userData == null) {
+      return const Center(child: Text("No se encontraron datos del usuario."));
+    }
 
-  final Map<String, String> profileMap = {
-    "Nombre": "${userData!.firstName} ${userData!.secondName ?? ''}".trim(),
-    "Apellidos":
-        "${userData!.firstLastName} ${userData!.secondLastName ?? ''}".trim(),
-    "Cédula": patientData?.nationalId ?? "Sin registrar",
-    "Teléfono": patientData?.phoneNumber ?? "Sin registrar",
-    "Ocupación": patientData?.occupation ?? "Sin registrar",
-  };
+    final Map<String, String> profileMap = {
+      "Nombre": "${userData!.firstName} ${userData!.secondName ?? ''}".trim(),
+      "Apellidos":
+          "${userData!.firstLastName} ${userData!.secondLastName ?? ''}".trim(),
+      "Cédula": patientData?.nationalId ?? "Sin registrar",
+      "Teléfono": patientData?.phoneNumber ?? "Sin registrar",
+      "Ocupación": patientData?.occupation ?? "Sin registrar",
+    };
 
-  return Center(
-    child: SingleChildScrollView(
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(16, 32, 16, 24),
-        constraints: const BoxConstraints(maxWidth: Breakpoint.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Column(
-                children: [
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundColor: HospiredColors.primary.withOpacity(0.2),
-                    child: const Icon(
-                      Icons.person,
-                      size: 50,
-                      color: HospiredColors.primary,
+    return Center(
+      child: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(16, 32, 16, 24),
+          constraints: const BoxConstraints(maxWidth: Breakpoint.md),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 50,
+                      backgroundColor: HospiredColors.primary.withOpacity(0.2),
+                      child: const Icon(
+                        Icons.person,
+                        size: 50,
+                        color: HospiredColors.primary,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    "${userData!.firstName} ${userData!.firstLastName}",
-                    style: HospiredTextStyle.title2,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    patientData?.occupation ?? "Sin ocupación registrada",
-                    style: HospiredTextStyle.body3,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 32),
-            Text("Información Personal", style: HospiredTextStyle.title3),
-            const SizedBox(height: 8),
-            ...profileMap.entries.map(
-              (entry) => Card(
-                elevation: 2,
-                margin: const EdgeInsets.symmetric(vertical: 6),
-                child: ListTile(
-                  leading: _getIconForKey(entry.key),
-                  title: Text(entry.key, style: HospiredTextStyle.body3),
-                  subtitle: Text(entry.value),
+                    const SizedBox(height: 16),
+                    Text(
+                      "${userData!.firstName} ${userData!.firstLastName}",
+                      style: HospiredTextStyle.title2,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      patientData?.occupation ?? "Sin ocupación registrada",
+                      style: HospiredTextStyle.body3,
+                    ),
+                  ],
                 ),
               ),
-            ),
-            const SizedBox(height: 16), // ✅ En lugar de Spacer
-            Center(
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Próximamente: Editar Perfil"),
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.edit),
-                label: const Text("Editar Perfil"),
+              const SizedBox(height: 32),
+              Text("Información Personal", style: HospiredTextStyle.title3),
+              const SizedBox(height: 8),
+              ...profileMap.entries.map(
+                (entry) => Card(
+                  elevation: 2,
+                  margin: const EdgeInsets.symmetric(vertical: 6),
+                  child: ListTile(
+                    leading: _getIconForKey(entry.key),
+                    title: Text(entry.key, style: HospiredTextStyle.body3),
+                    subtitle: Text(entry.value),
+                  ),
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 16),
+              Center(
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Próximamente: Editar Perfil"),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.edit),
+                  label: const Text("Editar Perfil"),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   Icon _getIconForKey(String key) {
     switch (key) {
