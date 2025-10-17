@@ -31,6 +31,7 @@ class BottomNavBar extends StatelessWidget {
           label: 'Tratamiento',
         ),
         BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Mapa'),
+        BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
         BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
       ],
     );

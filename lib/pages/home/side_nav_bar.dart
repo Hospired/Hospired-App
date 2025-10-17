@@ -39,6 +39,11 @@ class SideNavBar extends StatelessWidget {
         ),
         NavigationRailDestination(
           padding: EdgeInsets.symmetric(vertical: 8),
+          icon: Icon(Icons.chat),
+          label: Text('Chat'),
+        ),
+        NavigationRailDestination(
+          padding: EdgeInsets.symmetric(vertical: 8),
           icon: Icon(Icons.person),
           label: Text('Perfil'),
         ),
