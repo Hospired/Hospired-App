@@ -1,43 +1,127 @@
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-import '../../providers/app_user.dart';
-import '../../providers/patient.dart';
-import '../../text_styles.dart';
-import '../../breakpoints.dart';
-import 'next_appointment_card.dart';
-import 'user_summary_card.dart';
-
-class DashboardPage extends HookConsumerWidget {
+class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key, required this.onSelectNavIndex});
 
   final Function onSelectNavIndex;
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final appUser = ref.watch(appUserProvider);
-    final patient = ref.watch(patientProvider);
-
-    // Fallback, this should never happen as appUser is controlled by the parend widgets
-    if (appUser == null || patient == null) {
-      return Material();
+  void _launchURL(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      throw Exception("No se pudo abrir el enlace: $url");
     }
+  }
 
-    return Center(
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // Sección 1 - Encabezado oscuro con imagen alineada a la derecha
+        Container(
+          width: double.infinity,
+          color: const Color(0xFF29235c),
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [Image.asset("assets/logotipo.png", height: 80)],
+          ),
+        ),
+
+        // Sección 2 - Bienvenida
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+          color: Colors.white,
+          child: Column(
+            children: const [
+              Text(
+                "¡Bienvenido estimado paciente!",
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 8),
+              Text(
+                "Tu salud es nuestra prioridad.",
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+
+        // Sección 3 - Cards
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(20),
+          color: Colors.white,
+          child: Column(
+            children: [
+              _buildCard(
+                title: "Sitio Oficial",
+                description:
+                    "Visita nuestro sitio web para conocer más sobre Hospired.",
+                icon: Icons.language,
+                onTap: () => _launchURL("https://hospired.github.io/hospired/"),
+              ),
+              const SizedBox(height: 16),
+              _buildCard(
+                title: "Facebook",
+                description:
+                    "Síguenos en Facebook para estar al día con nuestras noticias.",
+                icon: Icons.facebook,
+                onTap: () => _launchURL("https://facebook.com"),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCard({
+    required String title,
+    required String description,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: const EdgeInsets.fromLTRB(16, 32, 16, 24),
-        constraints: BoxConstraints(maxWidth: Breakpoint.md),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Text('Bienvenido', style: HospiredTextStyle.sectionTitle),
-              ],
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
             ),
-            const SizedBox(height: 8),
-            UserSummaryCard(appUser: appUser, patient: patient),
-            const SizedBox(height: 16),
-            NextAppointmentCard(onTap: () => onSelectNavIndex(1)),
+          ],
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 40, color: Colors.blueAccent),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(description, style: const TextStyle(fontSize: 14)),
+                ],
+              ),
+            ),
           ],
         ),
       ),
