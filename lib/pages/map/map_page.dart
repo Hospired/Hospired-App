@@ -1,67 +1,68 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../providers/healthcare_facilities_provider.dart';
-import '../../backend-api/dtos.dart';
 
-class MapPage extends ConsumerStatefulWidget {
+class MapPage extends HookConsumerWidget {
   const MapPage({super.key});
 
   @override
-  ConsumerState<MapPage> createState() => _MapPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final healthcareFacilities = ref.watch(healthcareFacilitiesProvider);
+    final markers = useState<Set<Marker>>({});
+    final mapController = useState<GoogleMapController?>(null);
 
-class _MapPageState extends ConsumerState<MapPage> {
-  GoogleMapController? _controller;
-  final Set<Marker> _markers = {};
+    useEffect(() {
+      ref.read(healthcareFacilitiesProvider.notifier).fetch();
+      return;
+    }, []);
 
-  @override
-  Widget build(BuildContext context) {
-    final facilitiesAsync = ref.watch(healthcareFacilitiesProvider);
+    useEffect(() {
+      Set<Marker> currentMarkers = {};
+      for (var facility in (healthcareFacilities ?? [])) {
+        currentMarkers.add(
+          Marker(
+            markerId: MarkerId(facility.id.toString()),
+            position: LatLng(
+              facility.latitude.toDouble(),
+              facility.longitude.toDouble(),
+            ),
+            infoWindow: InfoWindow(title: facility.name),
+          ),
+        );
+      }
+      markers.value = currentMarkers;
+    }, [healthcareFacilities]);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Mapa de hospitales')),
-      body: facilitiesAsync.when(
-        data: (facilities) {
-          _markers.clear();
-          for (var f in facilities) {
-            _markers.add(
-              Marker(
-                markerId: MarkerId(f.id.toString()),
-                position: LatLng(f.latitude.toDouble(), f.longitude.toDouble()),
-                infoWindow: InfoWindow(title: f.name),
-              ),
-            );
+      body: GoogleMap(
+        initialCameraPosition: CameraPosition(
+          target: (healthcareFacilities ?? []).isNotEmpty
+              ? LatLng(
+                  healthcareFacilities!.first.latitude.toDouble(),
+                  healthcareFacilities.first.longitude.toDouble(),
+                )
+              : const LatLng(12.13, -86.25), // fallback
+          zoom: 12,
+        ),
+        markers: markers.value,
+        onMapCreated: (controller) {
+          mapController.value = controller;
+
+          // Solo para web: habilitar controles
+          if (kIsWeb) {
+            controller.setMapStyle(
+              null,
+            ); // puedes personalizar el estilo si quieres
           }
-
-          return GoogleMap(
-            initialCameraPosition: CameraPosition(
-              target: facilities.isNotEmpty
-                  ? LatLng(
-                      facilities.first.latitude.toDouble(),
-                      facilities.first.longitude.toDouble(),
-                    )
-                  : const LatLng(12.13, -86.25), // fallback
-              zoom: 12,
-            ),
-            markers: _markers,
-            onMapCreated: (controller) {
-              _controller = controller;
-
-              // Solo para web: habilitar controles
-              if (kIsWeb) {
-                _controller?.setMapStyle(null); // puedes personalizar el estilo si quieres
-              }
-            },
-            myLocationEnabled: true,
-            myLocationButtonEnabled: true,
-            zoomControlsEnabled: !kIsWeb, // controles de zoom solo en móvil
-          );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, st) => Center(child: Text('Error: $e')),
+        myLocationEnabled: true,
+        myLocationButtonEnabled: true,
+        zoomControlsEnabled: !kIsWeb, // controles de zoom solo en móvil
       ),
     );
   }

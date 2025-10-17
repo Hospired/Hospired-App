@@ -522,20 +522,19 @@ class HealthcareFacilityRes {
   double longitude;
   String? notes;
 
- factory HealthcareFacilityRes.fromJson(Map<String, dynamic> json) =>
-    HealthcareFacilityRes(
-      id: json["id"],
-      name: json["name"],
-      servesInss: json["serves_inss"],
-      isPublicMinsa: json["is_public_minsa"],
-      address: json["address"],
-      district: json["district"],
-      municipalityId: json["municipality_id"],
-      latitude: (json["latitude"] as num).toDouble(),
-      longitude: (json["longitude"] as num).toDouble(), 
-      notes: json["notes"],
-    );
-
+  factory HealthcareFacilityRes.fromJson(Map<String, dynamic> json) =>
+      HealthcareFacilityRes(
+        id: json["id"],
+        name: json["name"],
+        servesInss: json["serves_inss"],
+        isPublicMinsa: json["is_public_minsa"],
+        address: json["address"],
+        district: json["district"],
+        municipalityId: json["municipality_id"],
+        latitude: (json["latitude"] as num).toDouble(),
+        longitude: (json["longitude"] as num).toDouble(),
+        notes: json["notes"],
+      );
 
   Map<String, dynamic> toJson() => {
     "id": id,
@@ -610,31 +609,31 @@ class MunicipalityRes {
   MunicipalityRes({
     required this.id,
     required this.name,
-    required this.department,
+    required this.departmentId,
   });
 
   int id;
   String name;
-  String department;
+  int departmentId;
 
   factory MunicipalityRes.fromJson(Map<String, dynamic> json) =>
       MunicipalityRes(
         id: json["id"],
         name: json["name"],
-        department: json["department"],
+        departmentId: json["department_id"],
       );
 
   Map<String, dynamic> toJson() => {
     "id": id,
     "name": name,
-    "department": department,
+    "department_id": departmentId,
   };
 
-  MunicipalityRes copyWith({int? id, String? name, String? department}) {
+  MunicipalityRes copyWith({int? id, String? name, int? departmentId}) {
     return MunicipalityRes(
       id: id ?? this.id,
       name: name ?? this.name,
-      department: department ?? this.department,
+      departmentId: departmentId ?? this.departmentId,
     );
   }
 
@@ -644,10 +643,10 @@ class MunicipalityRes {
       other is MunicipalityRes &&
           other.id == id &&
           other.name == name &&
-          other.department == department;
+          other.departmentId == departmentId;
 
   @override
-  int get hashCode => Object.hashAll([id, name, department]);
+  int get hashCode => Object.hashAll([id, name, departmentId]);
 }
 
 class PatientRes {
