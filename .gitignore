@@ -51,4 +51,4 @@ app.*.map.json
 /lib/openai_configuration.dart
 
 # apiKey
-/android/app/src/main/AndroidManifest.xml
+

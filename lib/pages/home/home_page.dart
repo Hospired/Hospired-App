@@ -13,6 +13,7 @@ import '../dashboard/dashboard_page.dart';
 import '../treatments/treatment_page.dart';
 import '../profile/profile_page.dart';
 import '../map/map_page.dart';
+import '../chat/chat_page.dart';
 import 'bottom_nav_bar.dart';
 import 'side_nav_bar.dart';
 
@@ -131,9 +132,11 @@ class HomePage extends HookConsumerWidget {
                             : (selectedNavIndex.value == 2
                                   ? TreatmentPage()
                                   : (selectedNavIndex.value == 3
-                                        ? MapPage() // ✅ Nuevo
+                                        ? MapPage()
                                         : (selectedNavIndex.value == 4
-                                              ? ProfilePage() // ✅ Mover perfil a 4
+                                          ? ChatPage()
+                                          : selectedNavIndex.value == 5
+                                              ? ProfilePage() 
                                               : Column(
                                                   children: [
                                                     Text(
@@ -154,25 +157,27 @@ class HomePage extends HookConsumerWidget {
             body: selectedNavIndex.value == 0
                 ? DashboardPage(onSelectNavIndex: onSelectNavigationIndex)
                 : (selectedNavIndex.value == 1
-                      ? AppointmentsPage()
-                      : (selectedNavIndex.value == 2
-                            ? TreatmentPage()
-                            : (selectedNavIndex.value == 3
-                                  ? MapPage() // ✅ Nuevo
-                                  : (selectedNavIndex.value == 4
-                                        ? ProfilePage() // ✅ Mover perfil
-                                        : Column(
-                                            children: [
-                                              Text(
-                                                appUser?.toString() ??
-                                                    "No app user",
-                                              ),
-                                              Text(
-                                                authUser?.toString() ??
-                                                    "No auth user",
-                                              ),
-                                            ],
-                                          ))))),
+                            ? AppointmentsPage()
+                            : (selectedNavIndex.value == 2
+                                  ? TreatmentPage()
+                                  : (selectedNavIndex.value == 3
+                                        ? MapPage()
+                                        : (selectedNavIndex.value == 4
+                                          ? ChatPage()
+                                          : selectedNavIndex.value == 5
+                                              ? ProfilePage() 
+                                              : Column(
+                                                  children: [
+                                                    Text(
+                                                      appUser?.toString() ??
+                                                          "No app user",
+                                                    ),
+                                                    Text(
+                                                      authUser?.toString() ??
+                                                          "No auth user",
+                                                    ),
+                                                  ],
+                                                ))))),
             bottomNavigationBar: BottomNavBar(
               selectedIndex: selectedNavIndex.value,
               onTap: (index) => onSelectNavigationIndex(index),
